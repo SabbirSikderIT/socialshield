@@ -13,7 +13,7 @@
       <button class="chat-reset" id="chat-reset" title="Start a new chat">↺</button>
     </header>
     <div class="chat-body" id="chat-body">
-      <div class="msg bot">Hi {{ current_user.full_name.split(' ')[0] if current_user.is_authenticated and current_user.full_name else 'friend' }} 🌷 I'm Shelly. Ask me anything about Social Shield: events, fake calls, conversation starters, games, safety… or just say hi.</div>
+      <div class="msg bot">Hi {{ current_user.first_name if current_user.is_authenticated else 'friend' }} 🌷 I'm Shelly. Ask me anything about Social Shield: events, fake calls, conversation starters, games, safety… or just say hi.</div>
     </div>
     <div class="chat-suggest" id="chat-suggest">
       <button>Find a quiet event</button>

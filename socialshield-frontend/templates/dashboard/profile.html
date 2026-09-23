@@ -10,7 +10,7 @@
       <div class="form-group"><label>Username</label><input class="input" value="{{ u.username }}" disabled></div>
       <div class="form-group"><label>Email</label><input class="input" value="{{ u.email }}" disabled></div>
       <div class="form-row">
-        <div class="form-group"><label>Full name</label><input class="input" name="full_name" value="{{ u.full_name or '' }}"></div>
+        <div class="form-group"><label>Full name</label><input class="input" name="full_name" placeholder="e.g. Sabbir Sikder — first name first" value="{{ u.full_name or '' }}"><small class="muted">We greet you by your first word here, so put your first name first.</small></div>
         <div class="form-group"><label>City</label><input class="input" name="city" value="{{ u.city or '' }}"></div>
       </div>
       <div class="form-group"><label>Bio</label><textarea class="input" name="bio" maxlength="500">{{ u.bio or '' }}</textarea></div>

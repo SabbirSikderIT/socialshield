@@ -42,6 +42,14 @@ class User(UserMixin, db.Model):
     def check_password(self, raw):
         return check_password_hash(self.password_hash, raw)
 
+    @property
+    def first_name(self):
+        """First token of full_name (e.g. "Sabbir" from "Sabbir Prottoy"), for
+        friendly greetings. Falls back to username if full_name isn't set."""
+        if self.full_name and self.full_name.strip():
+            return self.full_name.strip().split()[0]
+        return self.username
+
 
 class Trigger(db.Model):
     __tablename__ = "triggers"

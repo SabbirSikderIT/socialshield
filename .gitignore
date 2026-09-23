@@ -4,3 +4,4 @@ socialshield-backend/instance/
 *.pyc
 .venv/
 venv/
+.claude/

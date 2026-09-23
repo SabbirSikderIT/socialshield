@@ -8,7 +8,7 @@
     <div class="dash-head glass mb-3">
       <div class="big-avatar">{{ u.avatar }}</div>
       <div style="flex:1">
-        <h1 style="font-size:1.9rem">Hi, {{ u.full_name or u.username }} 🌷</h1>
+        <h1 style="font-size:1.9rem">Hi, {{ u.first_name }} 🌷</h1>
         <p class="muted">{{ {'low':'Somewhat social','medium':'Nervous but trying','high':'Quiet soul','extreme':'Professional homebody'}[u.introversion_level] }} · {{ u.city }} · member since {{ u.created_at.strftime('%b %Y') }}</p>
         <div class="flex mt-1">{% for t in u.triggers %}<span class="chip pink">{{ t.icon }} {{ t.name }}</span>{% endfor %}</div>
       </div>
