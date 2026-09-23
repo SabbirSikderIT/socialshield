@@ -1,0 +1,851 @@
+<!--
+  This is the original single-file homepage mockup that the Social Shield project
+  started from. It is kept here only as a historical design reference and is not
+  served by the app. The live, database-driven site lives in ../templates/ and
+  ../static/, wired up by the Flask backend in ../../socialshield-backend/.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Shield - For Introverts and Antisocial People</title>
+    <style>
+        :root {
+            --primary-color: #5D5FEF;
+            --secondary-color: #F0F2FF;
+            --accent-color: #FF6B6B;
+            --dark-color: #2B2D42;
+            --light-color: #F7F7FF;
+            --success-color: #4CAF50;
+            --warning-color: #FFC107;
+            --danger-color: #F44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #4a4cbf;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+        }
+
+        .btn-accent:hover {
+            background-color: #e05555;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .features {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+        }
+
+        .events {
+            padding: 4rem 0;
+            background-color: var(--secondary-color);
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .event-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .event-image {
+            height: 200px;
+            background-color: #ddd;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .event-content {
+            padding: 1.5rem;
+        }
+
+        .event-date {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-card h3 {
+            margin-bottom: 1rem;
+        }
+
+        .event-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .fake-call-container {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .fake-call-display {
+            background-color: #444;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .call-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .conversation-starter {
+            background-color: var(--secondary-color);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+
+        .starter-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .starter-card {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .starter-card:hover {
+            transform: translateY(-3px);
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 3rem 0 1rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid #444;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* Game section styles */
+        .game-container {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+        }
+
+        .game-canvas {
+            width: 100%;
+            height: 400px;
+            background-color: #333;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Navigation -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">Social Shield</div>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#events">Events</a></li>
+                    <li><a href="#tools">Tools</a></li>
+                    <li><a href="#resources">Resources</a></li>
+                    <li><a href="#game">Game</a></li>
+                    <li><a href="#" class="btn btn-outline">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Navigate Social Situations With Confidence</h1>
+            <p>Social Shield helps introverts and socially anxious individuals handle gatherings, meet new people, and build confidence on their own terms.</p>
+            <a href="#" class="btn" id="signup-btn">Get Started</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">How Social Shield Helps You</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📅</div>
+                    <h3>Event Discovery</h3>
+                    <p>Find nearby social events with comfort ratings from fellow introverts. Know what to expect before you go.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📞</div>
+                    <h3>Fake Calls</h3>
+                    <p>Get out of awkward situations with realistic fake phone calls at the tap of a button.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>Conversation Starters</h3>
+                    <p>Never struggle with small talk again. Get context-appropriate icebreakers for any situation.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Safety Tools</h3>
+                    <p>Creep alerts, self-defense tips, and emergency contacts to keep you safe in social settings.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎮</div>
+                    <h3>Escape the Party Game</h3>
+                    <p>Practice social navigation in a fun, low-pressure game environment.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Progress Tracking</h3>
+                    <p>Monitor your comfort levels and celebrate your social victories, big and small.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section class="events" id="events">
+        <div class="container">
+            <h2 class="section-title">Upcoming Events Near You</h2>
+            <div class="events-grid">
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60');"></div>
+                    <div class="event-content">
+                        <div class="event-date">June 15, 2023 • 7:00 PM</div>
+                        <h3>Quiet Reading Night</h3>
+                        <p>A peaceful gathering for book lovers who prefer quiet company. Bring your current read!</p>
+                        <div class="event-meta">
+                            <span>⭐ 4.8 (12 reviews)</span>
+                            <span>👥 Small group</span>
+                        </div>
+                        <a href="#" class="btn btn-outline" style="margin-top: 1rem; display: inline-block;">View Details</a>
+                    </div>
+                </div>
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60');"></div>
+                    <div class="event-content">
+                        <div class="event-date">June 18, 2023 • 6:30 PM</div>
+                        <h3>Introvert Networking</h3>
+                        <p>Structured networking event with timed conversations and clear exit strategies.</p>
+                        <div class="event-meta">
+                            <span>⭐ 4.5 (8 reviews)</span>
+                            <span>👥 Medium group</span>
+                        </div>
+                        <a href="#" class="btn btn-outline" style="margin-top: 1rem; display: inline-block;">View Details</a>
+                    </div>
+                </div>
+                <div class="event-card">
+                    <div class="event-image" style="background-image: url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60');"></div>
+                    <div class="event-content">
+                        <div class="event-date">June 22, 2023 • 8:00 PM</div>
+                        <h3>Board Game Meetup</h3>
+                        <p>Focus on games rather than small talk. Perfect for socially anxious gamers.</p>
+                        <div class="event-meta">
+                            <span>⭐ 4.9 (15 reviews)</span>
+                            <span>👥 Small group</span>
+                        </div>
+                        <a href="#" class="btn btn-outline" style="margin-top: 1rem; display: inline-block;">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tools Section -->
+    <section class="tools" id="tools">
+        <div class="container">
+            <h2 class="section-title">Social Survival Tools</h2>
+
+            <!-- Fake Call Tool -->
+            <div class="fake-call-container">
+                <h3>Emergency Exit Call</h3>
+                <p>Tap below to generate a fake call that gives you an excuse to leave</p>
+                <div class="fake-call-display" id="fake-call-display">
+                    <p>Your fake call will appear here</p>
+                </div>
+                <div class="call-options">
+                    <button class="btn" onclick="generateFakeCall('family')">Family Emergency</button>
+                    <button class="btn" onclick="generateFakeCall('work')">Work Crisis</button>
+                    <button class="btn" onclick="generateFakeCall('funny')">Funny Excuse</button>
+                    <button class="btn btn-accent" onclick="startFakeCall()">Simulate Call</button>
+                </div>
+            </div>
+
+            <!-- Conversation Starters -->
+            <div class="conversation-starter">
+                <h3>Need Help Starting a Conversation?</h3>
+                <p>Try one of these context-appropriate icebreakers:</p>
+                <div class="starter-options">
+                    <div class="starter-card" onclick="copyStarter('Do you know any hidden game tourist spots in Dhaka?')">
+                        <p>"Do you know any hidden game tourist spots in Dhaka?"</p>
+                        <small>Party context</small>
+                    </div>
+                    <div class="starter-card" onclick="copyStarter('That\'s an interesting shirt! Where did you get it?')">
+                        <p>"That's an interesting shirt! Where did you get it?"</p>
+                        <small>Casual context</small>
+                    </div>
+                    <div class="starter-card" onclick="copyStarter('How do you know the host?')">
+                        <p>"How do you know the host?"</p>
+                        <small>Party context</small>
+                    </div>
+                    <div class="starter-card" onclick="copyStarter('What do you think about this event?')">
+                        <p>"What do you think about this event?"</p>
+                        <small>General context</small>
+                    </div>
+                </div>
+                <button class="btn" style="margin-top: 1rem;" onclick="showMoreStarters()">Show More Starters</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section class="resources" id="resources">
+        <div class="container">
+            <h2 class="section-title">Learning Resources</h2>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Recommended Books</h3>
+                    <ul style="list-style-type: none; margin-top: 1rem;">
+                        <li style="margin-bottom: 0.5rem;">📚 Quiet: The Power of Introverts</li>
+                        <li style="margin-bottom: 0.5rem;">📚 How to Win Friends and Influence People</li>
+                        <li style="margin-bottom: 0.5rem;">📚 The Social Skills Guidebook</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline" style="margin-top: 1rem; display: inline-block;">View All Books</a>
+                </div>
+                <div class="feature-card">
+                    <h3>Self-Defense Tips</h3>
+                    <ul style="list-style-type: none; margin-top: 1rem;">
+                        <li style="margin-bottom: 0.5rem;">🛡️ Basic Body Language</li>
+                        <li style="margin-bottom: 0.5rem;">🛡️ Verbal Boundary Setting</li>
+                        <li style="margin-bottom: 0.5rem;">🛡️ Easy Exit Strategies</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline" style="margin-top: 1rem; display: inline-block;">View All Tips</a>
+                </div>
+                <div class="feature-card">
+                    <h3>Skills to Build</h3>
+                    <ul style="list-style-type: none; margin-top: 1rem;">
+                        <li style="margin-bottom: 0.5rem;">💪 Small Talk Techniques</li>
+                        <li style="margin-bottom: 0.5rem;">💪 Appropriate Eye Contact</li>
+                        <li style="margin-bottom: 0.5rem;">💪 Graceful Party Exits</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline" style="margin-top: 1rem; display: inline-block;">View All Skills</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Game Section -->
+    <section class="game" id="game">
+        <div class="container">
+            <h2 class="section-title">Escape the Party Game</h2>
+            <p style="text-align: center; margin-bottom: 2rem;">Practice your social navigation skills in this fun, low-pressure game environment.</p>
+
+            <div class="game-container">
+                <div class="game-canvas" id="game-canvas">
+                    <!-- Game will be rendered here -->
+                    <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                        <button class="btn" onclick="startGame()">Start Game</button>
+                    </div>
+                </div>
+                <div class="game-controls">
+                    <div class="game-stats">
+                        <div>Level: <span id="game-level">1</span></div>
+                        <div>Score: <span id="game-score">0</span></div>
+                    </div>
+                    <button class="btn btn-accent" onclick="resetGame()">Reset</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Signup Modal -->
+    <div class="modal" id="signup-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Your Account</h2>
+                <button class="close-modal" onclick="closeModal('signup-modal')">&times;</button>
+            </div>
+            <form id="signup-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="introversion-level">How would you describe your social comfort level?</label>
+                    <select id="introversion-level" class="form-control" required>
+                        <option value="">Select an option</option>
+                        <option value="low">I'm somewhat comfortable socially</option>
+                        <option value="medium">Social situations make me nervous</option>
+                        <option value="high">I find social interactions very challenging</option>
+                        <option value="extreme">I avoid social situations whenever possible</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Social Shield</h3>
+                    <p>Helping introverts and socially anxious individuals navigate social situations with confidence.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#events">Events</a></li>
+                        <li><a href="#tools">Tools</a></li>
+                        <li><a href="#resources">Resources</a></li>
+                        <li><a href="#game">Game</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Connect</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">Facebook</a></li>
+                        <li><a href="#">Instagram</a></li>
+                        <li><a href="#">Discord</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 Social Shield. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Modal functions
+        document.getElementById('signup-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('signup-modal').style.display = 'flex';
+        });
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+
+        // Fake call generator
+        const fakeCalls = {
+            family: {
+                title: "Family Emergency",
+                script: "Hello? Oh no! Is everything okay? I'll be right there! (pause) Yes, I'm leaving now. I'll be there in 20 minutes. (pause) Okay, see you soon. Bye!"
+            },
+            work: {
+                title: "Work Crisis",
+                script: "What? The server is down? (pause) How long has this been going on? (pause) Okay, I'm on my way back to the office now. (pause) Yes, tell everyone I'll be there in 30. Bye."
+            },
+            funny: {
+                title: "Pet Emergency",
+                script: "Wait, my cat did WHAT? (pause) She knocked over the TV? (pause) And now she's stuck where? (pause) Okay, I need to get home immediately. Bye!"
+            }
+        };
+
+        function generateFakeCall(type) {
+            const call = fakeCalls[type];
+            const display = document.getElementById('fake-call-display');
+            display.innerHTML = `
+                <h4>${call.title}</h4>
+                <p>${call.script}</p>
+            `;
+        }
+
+        function startFakeCall() {
+            const display = document.getElementById('fake-call-display');
+            if (!display.textContent.includes("(")) {
+                alert("Please generate a call first!");
+                return;
+            }
+
+            alert("Pretend your phone is ringing! Here's your excuse to leave.");
+        }
+
+        // Conversation starter functions
+        function copyStarter(text) {
+            navigator.clipboard.writeText(text);
+            alert('Copied to clipboard: "' + text + '"');
+        }
+
+        function showMoreStarters() {
+            alert('This would show more conversation starters in a real implementation.');
+        }
+
+        // Game functions (simplified for this demo)
+        function startGame() {
+            const canvas = document.getElementById('game-canvas');
+            canvas.innerHTML = `
+                <div style="position: relative; width: 100%; height: 100%; background-color: #444; overflow: hidden;">
+                    <div id="player" style="position: absolute; bottom: 20px; left: 50px; width: 30px; height: 50px; background-color: #5D5FEF;"></div>
+                    <div id="obstacles">
+                        <div class="obstacle" style="position: absolute; top: 100px; left: 200px; width: 80px; height: 40px; background-color: #FF6B6B;">Over-sharer</div>
+                        <div class="obstacle" style="position: absolute; top: 200px; left: 350px; width: 80px; height: 40px; background-color: #FFC107;">Creepy Person</div>
+                        <div class="obstacle" style="position: absolute; top: 300px; left: 150px; width: 120px; height: 40px; background-color: #4CAF50;">Group Conversation</div>
+                    </div>
+                    <div id="exit" style="position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; background-color: white; border: 2px dashed #5D5FEF;">Exit</div>
+                </div>
+            `;
+
+            // Simple game controls for demo
+            const player = document.getElementById('player');
+            let playerX = 50;
+            let playerY = canvas.offsetHeight - 70;
+            let score = 0;
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowRight') playerX += 10;
+                if (e.key === 'ArrowLeft') playerX -= 10;
+                if (e.key === 'ArrowUp') playerY -= 10;
+                if (e.key === 'ArrowDown') playerY += 10;
+
+                // Boundary checking
+                if (playerX < 0) playerX = 0;
+                if (playerX > canvas.offsetWidth - 30) playerX = canvas.offsetWidth - 30;
+                if (playerY < 0) playerY = 0;
+                if (playerY > canvas.offsetHeight - 50) playerY = canvas.offsetHeight - 50;
+
+                player.style.left = playerX + 'px';
+                player.style.top = playerY + 'px';
+
+                // Check if reached exit
+                if (playerX > canvas.offsetWidth - 70 && playerY < 60) {
+                    score += 100;
+                    document.getElementById('game-score').textContent = score;
+                    alert('Congratulations! You escaped the party!');
+                }
+            });
+        }
+
+        function resetGame() {
+            const canvas = document.getElementById('game-canvas');
+            canvas.innerHTML = `
+                <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                    <button class="btn" onclick="startGame()">Start Game</button>
+                </div>
+            `;
+            document.getElementById('game-score').textContent = '0';
+        }
+
+        // Form submission
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Account created successfully! (This would connect to backend in a real implementation)');
+            closeModal('signup-modal');
+        });
+    </script>
+</body>
+</html>

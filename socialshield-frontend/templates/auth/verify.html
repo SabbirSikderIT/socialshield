@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Enter code{% endblock %}
+{% block content %}
+<div class="auth-wrap container">
+  <form class="auth-card glass" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <span class="auth-emoji">📬</span>
+    <h1>Check your inbox</h1>
+    <p class="sub">We sent a 6-digit code to <b>{{ email }}</b>. It expires in 15 minutes.</p>
+    <div class="form-group"><input class="input code-input" name="code" required inputmode="numeric" pattern="\d{6}" maxlength="6" autocomplete="one-time-code" autofocus placeholder="••••••"></div>
+    <button class="btn btn-primary btn-block btn-lg">Verify code</button>
+    <p class="center mt-2 small">Didn't get it? Check spam, or <a href="{{ url_for('auth.forgot_password') }}">request a new code</a>.</p>
+    <div class="flex mt-3" style="justify-content:center;gap:.4rem"><span class="chip">1 Email</span>→<span class="chip lav">2 Code</span>→<span class="chip">3 New password</span></div>
+  </form>
+</div>
+{% endblock %}

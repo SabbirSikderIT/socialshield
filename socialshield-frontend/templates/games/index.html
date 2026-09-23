@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Games{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <span class="eyebrow">🎮 Play &amp; practise</span>
+    <h1>{{ games|length }} cosy games <span class="grad-text">for quiet minds</span></h1>
+    <p>Lightweight games you can play right in your browser. Escape parties, dodge awkward questions, calm your mind. {% if not current_user.is_authenticated %}<a href="{{ url_for('auth.login') }}">Log in</a> to save scores to the leaderboard.{% endif %}</p>
+  </div>
+</section>
+<section style="padding-top:1rem">
+  <div class="container">
+    <div class="flex mb-3" style="justify-content:center" id="game-filter">
+      <button class="chip active" data-cat="">All</button>
+      {% for c in games|map(attribute='category')|unique|sort %}<button class="chip" data-cat="{{ c }}">{{ c }}</button>{% endfor %}
+    </div>
+    <div class="auto-grid sm">
+      {% for g in games %}
+      <a href="{{ url_for('games.play', slug=g.slug) }}" class="card hover game-card reveal" data-cat="{{ g.category }}">
+        <div class="game-thumb" style="background:linear-gradient(135deg,{{ g.colors }})"><span class="chip">{{ g.category }}</span>{{ g.icon }}</div>
+        <div class="gbody">
+          <h3>{{ g.title }}</h3>
+          <p>{{ g.description }}</p>
+          <div class="flex small muted between"><span>▶ {{ plays.get(g.id, 0) }} plays</span>{% if my_best.get(g.id) %}<span class="chip lav">🏆 Best {{ my_best[g.id] }}</span>{% endif %}</div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.querySelectorAll('#game-filter .chip').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#game-filter .chip').forEach(x => x.classList.remove('active')); b.classList.add('active');
+    document.querySelectorAll('.game-card').forEach(c => c.style.display = !b.dataset.cat || c.dataset.cat === b.dataset.cat ? '' : 'none');
+  }));
+</script>
+{% endblock %}

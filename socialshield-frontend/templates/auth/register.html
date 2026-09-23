@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Join{% endblock %}
+{% block content %}
+<div class="auth-wrap container">
+  <form class="auth-card wide glass" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <span class="auth-emoji">🌱</span>
+    <h1>Create your shield</h1>
+    <p class="sub">Tell us a little about you, only what you're comfortable sharing.</p>
+
+    <div class="form-row">
+      <div class="form-group"><label>Username</label><input class="input" name="username" required pattern="[A-Za-z0-9_.]{3,30}" value="{{ form.get('username','') }}" autocomplete="username"></div>
+      <div class="form-group"><label>Full name <span class="muted">(optional)</span></label><input class="input" name="full_name" value="{{ form.get('full_name','') }}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Email</label><input class="input" type="email" name="email" required value="{{ form.get('email','') }}" autocomplete="email"></div>
+      <div class="form-group"><label>City</label><input class="input" name="city" value="{{ form.get('city','Dhaka') }}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Password</label>
+        <div class="pw-field"><input class="input" type="password" name="password" required minlength="8" data-strength="#pwm" autocomplete="new-password"><button type="button" class="pw-toggle">👁️</button></div>
+        <div class="pw-meter"><i id="pwm"></i></div><small class="muted">8+ characters with letters and numbers</small></div>
+      <div class="form-group"><label>Confirm password</label>
+        <div class="pw-field"><input class="input" type="password" name="confirm" required minlength="8" autocomplete="new-password"><button type="button" class="pw-toggle">👁️</button></div></div>
+    </div>
+
+    <div class="form-group"><label>Pick an avatar</label>
+      <div class="avatar-pick">{% for a in avatars %}<label><input type="radio" name="avatar" value="{{ a }}" {{ 'checked' if form.get('avatar', avatars[0]) == a }}><span>{{ a }}</span></label>{% endfor %}</div></div>
+
+    <div class="form-group"><label>How would you describe your social comfort?</label>
+      <select class="input" name="introversion_level">
+        {% for v, l in [('low',"🙂 I'm somewhat comfortable socially"),('medium','😬 Social situations make me nervous'),('high','😰 I find social interactions very challenging'),('extreme','🏠 I avoid social situations whenever possible')] %}
+        <option value="{{ v }}" {{ 'selected' if form.get('introversion_level','medium') == v }}>{{ l }}</option>{% endfor %}
+      </select></div>
+
+    <div class="form-group"><label>Your trigger zones <span class="muted">(pick any)</span></label>
+      <div class="check-grid">{% for t in triggers %}<label class="check-pill"><input type="checkbox" name="triggers" value="{{ t.id }}"><span>{{ t.icon }} {{ t.name }}</span></label>{% endfor %}</div></div>
+
+    <div class="form-row">
+      <div class="form-group"><label>A tiny goal <span class="muted">(optional)</span></label><input class="input" name="goal" placeholder="Make 1 friend per event" value="{{ form.get('goal','') }}"></div>
+      <div class="form-group"><label>Target (times)</label><input class="input" type="number" name="goal_target" min="1" max="100" value="{{ form.get('goal_target', 3) }}"></div>
+    </div>
+
+    <button class="btn btn-primary btn-block btn-lg">Create my account</button>
+    <p class="center mt-2">Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+  </form>
+</div>
+{% endblock %}

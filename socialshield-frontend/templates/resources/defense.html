@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ d.title }}{% endblock %}
+{% block content %}
+<section style="padding-top:1.5rem">
+  <div class="container">
+    <a href="{{ url_for('resources.index') }}#defense" class="btn btn-glass btn-sm mb-2">← All safety tutorials</a>
+    <div class="detail-layout">
+      <div class="card">
+        <div class="flex"><div class="big-avatar" style="background:var(--grad-sky)">{{ d.icon }}</div>
+          <div><h1 style="font-size:2rem">{{ d.title }}</h1>
+            <div class="flex"><span class="chip sky">{{ d.category }}</span><span class="chip">⏱ {{ d.duration_minutes }} min</span><span class="chip mint">{{ d.difficulty }}</span></div></div></div>
+        <p class="mt-2" style="font-size:1.1rem">{{ d.summary }}</p>
+        <h2 class="mt-3 mb-2">👣 How to do it</h2>
+        <ol class="steps">{% for st in d.steps|nl2list %}<li>{{ st }}</li>{% endfor %}</ol>
+        <div class="flash flash-info glass mt-2">💡 Practise slowly with a friend or in front of a mirror. Repetition builds muscle memory so you can act calmly under stress.</div>
+      </div>
+      <div>
+        <div class="card mb-2">
+          <h3>🎬 Watch tutorials</h3>
+          <p class="small muted mb-1">Curated video search for this technique.</p>
+          <a href="{{ d.media_url }}" target="_blank" rel="noopener" class="btn btn-primary btn-block">▶ Open videos</a>
+        </div>
+        <div class="card mb-2">
+          <h3>🚨 Emergency numbers</h3>
+          <a class="list-row" href="tel:999">National Emergency <b>999</b></a>
+          <a class="list-row" href="tel:109">Women &amp; Children <b>109</b></a>
+        </div>
+        {% if related %}
+        <div class="card">
+          <h3 class="mb-1">Related</h3>
+          {% for r in related %}<a class="list-row" href="{{ url_for('resources.defense', item_id=r.id) }}">{{ r.icon }} {{ r.title }}</a>{% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

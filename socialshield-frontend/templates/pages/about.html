@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <span class="eyebrow">🛡️ Our story</span>
+    <h1>A social app for people who <span class="grad-text">don't love socialising</span></h1>
+    <p>Traditional social apps are built to connect people but rarely help those who fear or avoid social interaction. Social Shield is different.</p>
+  </div>
+</section>
+<section style="padding-top:1rem">
+  <div class="container grid grid-2">
+    <div class="card prose">
+      <h2>😣 The problem</h2>
+      <p>Many people feel extreme discomfort at parties, networking events or even casual hangouts. These situations can trigger social anxiety, overstimulation and avoidance.</p>
+      <h2>🌱 Our solution</h2>
+      <p>Social Shield is a smart social assistant tailored for introverts. It helps you:</p>
+      <ul>
+        <li>Avoid unwanted interactions with fake calls and exit excuses</li>
+        <li>Feel more confident with conversation starters and skill guides</li>
+        <li>Stay safe with creep alerts and self-defense tutorials</li>
+        <li>Gamify your social progress with 17 cosy games</li>
+        <li>Reflect and track your mood and social battery over time</li>
+      </ul>
+    </div>
+    <div class="card prose">
+      <h2>🗄️ Built on a relational database</h2>
+      <p>Social Shield is a DBMS project. A normalised <b>PostgreSQL</b> database connects 20+ tables: users, trigger zones, goals, events, reviews, creep reports, RSVPs, fake-call scripts, conversation templates, exit excuses, self-defense content, books, skills, games, game progress, mood logs, reflections and chat history.</p>
+      <h2>🧰 Technology</h2>
+      <ul>
+        <li><b>Frontend:</b> HTML, CSS (glassmorphism), vanilla JavaScript, Canvas games</li>
+        <li><b>Backend:</b> Python · Flask · SQLAlchemy</li>
+        <li><b>Database:</b> PostgreSQL (currently running on {{ db_engine }})</li>
+        <li><b>AI:</b> Google Gemini powers Shelly, our chatbot</li>
+        <li><b>Email:</b> Gmail SMTP for password recovery</li>
+      </ul>
+      <h2>💜 Values</h2>
+      <p>Introversion is not a flaw. We add humour and gamification to sensitive topics, but always with kindness.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

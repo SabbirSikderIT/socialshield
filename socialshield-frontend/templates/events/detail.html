@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }}{% endblock %}
+{% block content %}
+<section style="padding-top:1.5rem">
+  <div class="container">
+    <a href="{{ url_for('events.index') }}" class="btn btn-glass btn-sm mb-2">← All events</a>
+    {% if event.active_alerts %}
+      <div class="flash flash-warning glass mb-2">🚨 {{ event.active_alerts|length }} active creep alert{{ 's' if event.active_alerts|length > 1 }} reported for this event. <a href="#alerts">Read before you go.</a></div>
+    {% endif %}
+    <div class="event-hero">
+      <div class="card">
+        <div class="cover-big cover-{{ event.id % 6 }}">{{ event.emoji }}</div>
+        <div class="flex mt-2">
+          <span class="chip lav">{{ event.category }}</span>
+          {% if event.price == 0 %}<span class="chip mint">Free</span>{% else %}<span class="chip sun">৳{{ event.price }}</span>{% endif %}
+          {% if event.quiet_zone %}<span class="chip mint">🤫 Quiet zone</span>{% endif %}
+          {% if event.easy_exit %}<span class="chip sky">🚪 Easy exit</span>{% endif %}
+          {% if event.structured %}<span class="chip pink">📋 Structured</span>{% endif %}
+        </div>
+        <h1 class="mt-2" style="font-size:2rem">{{ event.title }}</h1>
+        <p class="mt-1">{{ event.description }}</p>
+      </div>
+      <div class="card">
+        <h3 class="mb-2">Event details</h3>
+        <dl class="kv">
+          <dt>🕒 When</dt><dd>{{ event.start_time|pretty_dt('%A, %d %B %Y · %I:%M %p') }}</dd>
+          <dt>⏳ Duration</dt><dd>{{ event.duration_minutes }} minutes</dd>
+          <dt>📍 Venue</dt><dd>{{ event.venue }}, {{ event.area }}, {{ event.city }}</dd>
+          <dt>👥 Crowd</dt><dd>{{ event.crowd_size|capitalize }} (cap. {{ event.capacity }})</dd>
+          <dt>🔊 Noise</dt><dd>{{ '🔈' * event.noise_level }} {{ event.noise_level }}/5</dd>
+          <dt>🧑‍🤝‍🧑 Going</dt><dd>{{ going }} people{% if buddies %} · {{ buddies }} want a quiet buddy{% endif %}</dd>
+          <dt>🏷️ Organiser</dt><dd>{{ event.organizer }}</dd>
+        </dl>
+        <div class="mt-2">
+          <div class="meter bar-comfort"><label>Comfort</label><div class="bar"><i style="width:{{ ((s.comfort or 0)/5*100)|round }}%"></i></div><b>{{ s.comfort or '–' }}</b></div>
+          <div class="meter bar-creep"><label>Creep risk</label><div class="bar"><i style="width:{{ ((s.creep or 0)/5*100)|round }}%"></i></div><b>{{ s.creep or '–' }}</b></div>
+          <p class="small muted">Based on {{ s.count }} review{{ 's' if s.count != 1 }}</p>
+        </div>
+        <a class="btn btn-glass btn-sm mt-1" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ (event.venue ~ ' ' ~ event.area ~ ' Dhaka')|urlencode }}">🗺️ Scout venue on Maps</a>
+
+        <hr style="border:0;border-top:1px solid rgba(255,255,255,.8);margin:1.2rem 0">
+        {% if current_user.is_authenticated %}
+          <form method="post" action="{{ url_for('events.rsvp', event_id=event.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label class="check mb-1"><input type="checkbox" name="buddy" value="1" {{ 'checked' if my_rsvp and my_rsvp.buddy_wanted }}> I'd like a quiet buddy to go with</label>
+            <div class="flex">
+              <button name="action" value="going" class="btn btn-primary btn-sm">{{ '✅ Going' if my_rsvp and my_rsvp.status == 'going' else "I'm going" }}</button>
+              <button name="action" value="maybe" class="btn btn-glass btn-sm">{{ '🤔 Maybe ✓' if my_rsvp and my_rsvp.status == 'maybe' else 'Maybe' }}</button>
+              {% if my_rsvp %}<button name="action" value="cancel" class="btn btn-glass btn-sm">Cancel</button>{% endif %}
+            </div>
+          </form>
+          <div class="flex mt-2">
+            <a href="{{ url_for('tools.index') }}#fakecall" class="btn btn-mint btn-sm">📞 Prep a fake call</a>
+            <button class="btn btn-danger btn-sm" data-open="#report-modal">🚨 Report creep alert</button>
+          </div>
+        {% else %}
+          <p><a href="{{ url_for('auth.login', next=request.path) }}">Log in</a> to RSVP, rate or report.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="container grid grid-2">
+    <div id="reviews">
+      <h2 class="mb-2">⭐ Community ratings</h2>
+      {% if current_user.is_authenticated %}
+      <form class="card mb-2" method="post" action="{{ url_for('events.review', event_id=event.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <h3>{{ 'Update your rating' if my_review else 'Rate this event' }}</h3>
+        <div class="form-row">
+          <div><span class="label">Comfort (5 = very calm)</span>
+            <div class="star-input">{% for i in range(5, 0, -1) %}<input type="radio" id="c{{ i }}" name="comfort" value="{{ i }}" {{ 'checked' if (my_review and my_review.comfort_rating == i) or (not my_review and i == 4) }}><label for="c{{ i }}">🌸</label>{% endfor %}</div></div>
+          <div><span class="label">Creep risk (5 = risky)</span>
+            <div class="star-input">{% for i in range(5, 0, -1) %}<input type="radio" id="k{{ i }}" name="creep" value="{{ i }}" {{ 'checked' if (my_review and my_review.creep_risk == i) or (not my_review and i == 1) }}><label for="k{{ i }}">👹</label>{% endfor %}</div></div>
+        </div>
+        <div class="form-group mt-1"><label>Crowd type</label>
+          <select class="input" name="crowd_type">{% for c in ['Quiet readers','Mixed','Students','Professionals','Artsy folks','Gamers','Party crowd'] %}<option {{ 'selected' if my_review and my_review.crowd_type == c }}>{{ c }}</option>{% endfor %}</select></div>
+        <div class="form-group"><label>Comment</label><textarea class="input" name="comment" placeholder="How did it feel? Any tips for fellow introverts?">{{ my_review.comment if my_review else '' }}</textarea></div>
+        <button class="btn btn-primary">Save rating</button>
+      </form>
+      {% endif %}
+      {% for r in reviews %}
+        <div class="review glass">
+          <div class="flex between"><strong>{{ r.user.avatar }} {{ r.user.username }}</strong><small class="muted">{{ r.created_at.strftime('%d %b %Y') }}</small></div>
+          <div class="flex small mt-1"><span class="chip mint">Comfort {{ r.comfort_rating }}/5</span><span class="chip danger">Creep {{ r.creep_risk }}/5</span>{% if r.crowd_type %}<span class="chip">{{ r.crowd_type }}</span>{% endif %}</div>
+          {% if r.comment %}<p class="mt-1">{{ r.comment }}</p>{% endif %}
+        </div>
+      {% else %}
+        <div class="empty glass"><span class="e">🌱</span>No ratings yet. Be the first!</div>
+      {% endfor %}
+    </div>
+
+    <div id="alerts">
+      <h2 class="mb-2">🚨 Creep alerts</h2>
+      {% for a in reports %}
+        <div class="alert-card glass sev-{{ a.severity }} mb-1">
+          <div class="flex between"><span class="chip {{ 'danger' if a.severity == 'high' else 'sun' }}">{{ a.severity|capitalize }} severity</span>
+            <span class="chip {{ 'mint' if a.status == 'resolved' else ('lav' if a.status == 'verified' else '') }}">{{ a.status|capitalize }}</span></div>
+          <p class="mt-1">{{ a.description }}</p>
+          <small class="muted">{% if a.location_hint %}📍 {{ a.location_hint }} · {% endif %}{{ 'Anonymous' if a.anonymous or not a.reporter else a.reporter.username }} · {{ a.created_at.strftime('%d %b %Y') }}</small>
+        </div>
+      {% else %}
+        <div class="empty glass"><span class="e">🕊️</span>No creep alerts reported. Still, trust your gut.</div>
+      {% endfor %}
+
+      <div class="card mt-2">
+        <h3>🧰 Your event survival plan</h3>
+        <ul class="steps mt-1">
+          <li>Scout the venue photos and note the exits.</li>
+          <li>Pick 2 conversation starters from the Tools page.</li>
+          <li>Set a fake call for {{ [30, event.duration_minutes // 2]|min }} minutes in.</li>
+          <li>Plan your ride home before you arrive.</li>
+          <li>Reflect afterwards in your dashboard.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if similar %}
+<section style="padding-top:0">
+  <div class="container">
+    <h2 class="mb-2">You might also like</h2>
+    <div class="auto-grid">{% for e in similar %}{% include "partials/event_card.html" %}{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if current_user.is_authenticated %}
+<div class="modal" id="report-modal">
+  <form class="card" method="post" action="{{ url_for('events.report', event_id=event.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="flex between mb-2"><h2>🚨 Report a creep alert</h2><button type="button" class="icon-btn" data-close>✕</button></div>
+    <p class="muted small mb-2">Your report warns other attendees. If you're in immediate danger, call <b>999</b>.</p>
+    <div class="form-group"><label>Severity</label>
+      <select class="input" name="severity"><option value="low">Low: uncomfortable behaviour</option><option value="medium" selected>Medium: persistent / boundary-crossing</option><option value="high">High: threatening / harassment</option></select></div>
+    <div class="form-group"><label>What happened?</label><textarea class="input" name="description" required minlength="10" placeholder="Describe the behaviour (no need to name anyone)"></textarea></div>
+    <div class="form-group"><label>Where? (optional)</label><input class="input" name="location_hint" placeholder="e.g. near the entrance"></div>
+    <label class="check mb-2"><input type="checkbox" name="anonymous" value="1" checked> Report anonymously</label>
+    <button class="btn btn-danger btn-block">Send alert</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

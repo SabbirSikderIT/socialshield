@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>{% endblock %}
+{% block content %}
+{% set u = current_user %}
+<section style="padding-top:1.5rem">
+  <div class="container">
+    <div class="dash-head glass mb-3">
+      <div class="big-avatar">{{ u.avatar }}</div>
+      <div style="flex:1">
+        <h1 style="font-size:1.9rem">Hi, {{ u.full_name or u.username }} 🌷</h1>
+        <p class="muted">{{ {'low':'Somewhat social','medium':'Nervous but trying','high':'Quiet soul','extreme':'Professional homebody'}[u.introversion_level] }} · {{ u.city }} · member since {{ u.created_at.strftime('%b %Y') }}</p>
+        <div class="flex mt-1">{% for t in u.triggers %}<span class="chip pink">{{ t.icon }} {{ t.name }}</span>{% endfor %}</div>
+      </div>
+      <div style="min-width:200px">
+        <span class="label">🔋 Social battery</span>
+        <div class="battery" style="height:40px"><i style="width:{{ u.social_battery }}%;background:{{ 'linear-gradient(90deg,#84fab0,#8fd3f4)' if u.social_battery > 60 else ('linear-gradient(90deg,#f6d365,#fda085)' if u.social_battery > 30 else 'linear-gradient(90deg,#ff9a9e,#e76f7f)') }}"></i></div>
+        <small class="muted">{{ u.social_battery }}% · <a href="{{ url_for('dashboard.profile') }}">Edit profile</a></small>
+      </div>
+    </div>
+
+    <div class="stats-row mb-3">
+      <div class="stat glass"><b class="grad-text">{{ stats.events_attended }}</b><span>events attended</span></div>
+      <div class="stat glass"><b class="grad-text">{{ stats.reflections }}</b><span>reflections</span></div>
+      <div class="stat glass"><b class="grad-text">{{ stats.people_talked }}</b><span>people talked to</span></div>
+      <div class="stat glass"><b class="grad-text">{{ stats.mood_week }}</b><span>avg mood (7d)</span></div>
+      <div class="stat glass"><b class="grad-text">{{ stats.games_played }}</b><span>games played</span></div>
+      <div class="stat glass"><b class="grad-text">{{ stats.books_finished }}</b><span>books finished</span></div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="card span-8">
+        <h3 class="mb-2">📈 Mood &amp; social battery (last 14 logs)</h3>
+        {% if chart.labels %}<canvas id="moodChart" height="120"></canvas>{% else %}<div class="empty"><span class="e">🌱</span>Log your first mood to see your chart.</div>{% endif %}
+      </div>
+      <div class="card span-4" id="mood">
+        <h3 class="mb-2">🌤️ How are you feeling?</h3>
+        <form method="post" action="{{ url_for('dashboard.mood') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mood-pick mb-2">{% for v, e in [(1,'😣'),(2,'😕'),(3,'😐'),(4,'🙂'),(5,'😊')] %}<label><input type="radio" name="mood" value="{{ v }}" {{ 'checked' if v == 3 }}><span>{{ e }}</span></label>{% endfor %}</div>
+          <label class="label">Social battery: <span class="range-val" id="en-out"></span></label>
+          <input type="range" name="energy" min="0" max="100" value="{{ u.social_battery }}" data-out="#en-out" data-suffix="%">
+          <input class="input mt-1" name="note" maxlength="280" placeholder="A tiny note (optional)">
+          <button class="btn btn-primary btn-block mt-2">Log mood</button>
+        </form>
+      </div>
+
+      <div class="card span-5" id="goals">
+        <h3 class="mb-2">🎯 My goals</h3>
+        {% for g in u.goals %}
+          <div class="goal">
+            <div class="flex between"><b>{{ '✅ ' if g.done }}{{ g.title }}</b><small>{{ g.progress }}/{{ g.target }}</small></div>
+            <div class="bar"><i style="width:{{ (g.progress / g.target * 100)|round }}%"></i></div>
+            <div class="flex">
+              {% for act, lbl in [('dec','−'),('inc','+'),('delete','🗑')] %}
+              <form method="post" action="{{ url_for('dashboard.goal') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="goal_id" value="{{ g.id }}"><button class="icon-btn" name="action" value="{{ act }}" title="{{ act }}">{{ lbl }}</button></form>
+              {% endfor %}
+            </div>
+          </div>
+        {% else %}<p class="muted mb-2">No goals yet. Start tiny!</p>{% endfor %}
+        <form method="post" action="{{ url_for('dashboard.goal') }}" class="flex mt-2">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input class="input" name="title" placeholder="e.g. Say hi to 1 new person" style="flex:1;min-width:160px" required>
+          <input class="input" type="number" name="target" value="3" min="1" max="100" style="width:80px">
+          <button class="btn btn-primary btn-sm" name="action" value="add">Add</button>
+        </form>
+      </div>
+
+      <div class="card span-7">
+        <h3 class="mb-2">💡 Suggestions for you</h3>
+        {% for t in tips %}<div class="list-row">{{ t }}</div>{% endfor %}
+        <h3 class="mt-3 mb-2">📅 Upcoming RSVPs</h3>
+        {% for r, e in upcoming %}
+          <a class="list-row" href="{{ url_for('events.detail', event_id=e.id) }}"><span>{{ e.emoji }} {{ e.title }}</span><small class="muted">{{ e.start_time|pretty_dt }} · {{ r.status }}{{ ' · 🤗 buddy' if r.buddy_wanted }}</small></a>
+        {% else %}<p class="muted">No upcoming events. <a href="{{ url_for('events.index') }}">Find a calm one →</a></p>{% endfor %}
+      </div>
+
+      <div class="card span-7" id="reflect">
+        <h3 class="mb-2">📝 Post-event reflection</h3>
+        <form method="post" action="{{ url_for('dashboard.reflection') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="form-row">
+            <div class="form-group"><label>Event (optional)</label>
+              <select class="input" name="event_id"><option value="">Other situation</option>
+                {% for e in events %}<option value="{{ e.id }}">{{ e.title }} ({{ e.start_time.strftime('%d %b') }})</option>{% endfor %}
+              </select></div>
+            <div class="form-group"><label>Situation</label><input class="input" name="situation" placeholder="e.g. Cousin's wedding"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Anxiety before: <span class="range-val" id="ab"></span></label><input type="range" name="anxiety_before" min="1" max="10" value="7" data-out="#ab" data-suffix="/10"></div>
+            <div class="form-group"><label>Anxiety after: <span class="range-val" id="aa"></span></label><input type="range" name="anxiety_after" min="1" max="10" value="5" data-out="#aa" data-suffix="/10"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Overall comfort: <span class="range-val" id="cl"></span></label><input type="range" name="comfort_level" min="1" max="10" value="6" data-out="#cl" data-suffix="/10"></div>
+            <div class="form-group"><label>People I talked to</label><input class="input" type="number" name="people_talked" min="0" value="1"></div>
+          </div>
+          <div class="form-group"><label>Tools I used</label>
+            <div class="check-grid">{% for t in ['Conversation starters','Fake call','Exit excuse','Breathing','Grounding','Buddy','Quiet corner'] %}<label class="check-pill"><input type="checkbox" name="used_tools" value="{{ t }}"><span>{{ t }}</span></label>{% endfor %}</div></div>
+          <div class="form-row">
+            <div class="form-group"><label>What went well? 🌟</label><textarea class="input" name="went_well"></textarea></div>
+            <div class="form-group"><label>What was hard? 🌧️</label><textarea class="input" name="challenges"></textarea></div>
+          </div>
+          <button class="btn btn-primary">Save reflection</button>
+        </form>
+      </div>
+
+      <div class="card span-5">
+        <h3 class="mb-2">😰 Anxiety before vs after</h3>
+        {% if anxiety.labels %}<canvas id="anxChart" height="200"></canvas>{% else %}<div class="empty"><span class="e">📝</span>Reflections will appear here.</div>{% endif %}
+        <h3 class="mt-3 mb-1">Recent reflections</h3>
+        {% for f in feedback %}
+          <div class="list-row"><span>{{ f.situation }}</span><small class="muted">{{ f.anxiety_before }}→{{ f.anxiety_after }} · {{ f.created_at.strftime('%d %b') }}</small></div>
+        {% else %}<p class="muted small">Nothing yet.</p>{% endfor %}
+      </div>
+
+      <div class="card span-6">
+        <h3 class="mb-2">🎮 My games</h3>
+        {% for title, icon, slug, best, n in games %}
+          <a class="list-row" href="{{ url_for('games.play', slug=slug) }}"><span>{{ icon }} {{ title }}</span><small>🏆 {{ best }} · {{ n }} plays</small></a>
+        {% else %}<p class="muted">No games played yet. <a href="{{ url_for('games.index') }}">Play one →</a></p>{% endfor %}
+      </div>
+      <div class="card span-6">
+        <h3 class="mb-2">📚 Reading list</h3>
+        {% for ub in books %}
+          <a class="list-row" href="{{ url_for('resources.book', book_id=ub.book_id) }}"><span>{{ ub.book.title }}</span><span class="chip {{ {'want':'sun','reading':'lav','finished':'mint'}[ub.status] }}">{{ ub.status }}</span></a>
+        {% else %}<p class="muted">Your list is empty. <a href="{{ url_for('resources.index') }}">Browse books →</a></p>{% endfor %}
+        <h3 class="mt-3 mb-1">🌤️ Mood notes</h3>
+        {% for m in moods[:5] if m.note %}<div class="list-row"><span>{{ ['','😣','😕','😐','🙂','😊'][m.mood] }} {{ m.note }}</span><small class="muted">{{ m.created_at.strftime('%d %b') }}</small></div>{% else %}<p class="muted small">No notes yet.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  if (window.Chart) {
+    Chart.defaults.font.family = 'Quicksand';
+    Chart.defaults.color = '#6b6280';
+    const chart = {{ chart|tojson }}, anx = {{ anxiety|tojson }};
+    const mc = document.getElementById('moodChart');
+    if (mc) new Chart(mc, {
+      type: 'line',
+      data: { labels: chart.labels, datasets: [
+        { label: 'Mood (1–5)', data: chart.mood, borderColor: '#8e6bbf', backgroundColor: 'rgba(142,107,191,.15)', tension: .4, fill: true, yAxisID: 'y' },
+        { label: 'Social battery %', data: chart.energy, borderColor: '#74c69d', backgroundColor: 'rgba(116,198,157,.12)', tension: .4, fill: true, yAxisID: 'y1' } ] },
+      options: { interaction: { mode: 'index', intersect: false }, scales: {
+        y: { min: 0, max: 5, grid: { color: 'rgba(255,255,255,.6)' } },
+        y1: { min: 0, max: 100, position: 'right', grid: { display: false } } } }
+    });
+    const ac = document.getElementById('anxChart');
+    if (ac) new Chart(ac, {
+      type: 'bar',
+      data: { labels: anx.labels, datasets: [
+        { label: 'Before', data: anx.before, backgroundColor: 'rgba(255,143,171,.7)', borderRadius: 8 },
+        { label: 'After', data: anx.after, backgroundColor: 'rgba(127,183,230,.7)', borderRadius: 8 } ] },
+      options: { scales: { y: { min: 0, max: 10 } } }
+    });
+  }
+</script>
+{% endblock %}

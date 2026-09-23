@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}New password{% endblock %}
+{% block content %}
+<div class="auth-wrap container">
+  <form class="auth-card glass" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <span class="auth-emoji">🔐</span>
+    <h1>Choose a new password</h1>
+    <p class="sub">Make it strong, then take a deep breath. You're almost done.</p>
+    <div class="form-group"><label>New password</label>
+      <div class="pw-field"><input class="input" type="password" name="password" required minlength="8" data-strength="#pwm" autocomplete="new-password" autofocus><button type="button" class="pw-toggle">👁️</button></div>
+      <div class="pw-meter"><i id="pwm"></i></div></div>
+    <div class="form-group"><label>Confirm password</label>
+      <div class="pw-field"><input class="input" type="password" name="confirm" required minlength="8" autocomplete="new-password"><button type="button" class="pw-toggle">👁️</button></div></div>
+    <button class="btn btn-primary btn-block btn-lg">Update password</button>
+    <div class="flex mt-3" style="justify-content:center;gap:.4rem"><span class="chip">1 Email</span>→<span class="chip">2 Code</span>→<span class="chip lav">3 New password</span></div>
+  </form>
+</div>
+{% endblock %}

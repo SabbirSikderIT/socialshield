@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ game.title }}{% endblock %}
+{% block content %}
+<section style="padding-top:1.5rem">
+  <div class="container">
+    <a href="{{ url_for('games.index') }}" class="btn btn-glass btn-sm mb-2">← All games</a>
+    <div class="game-layout">
+      <div class="glass game-stage">
+        <div class="game-hud">
+          <div class="flex"><span style="font-size:1.8rem">{{ game.icon }}</span><h1 style="font-size:1.5rem">{{ game.title }}</h1></div>
+          <div class="flex">
+            <span class="chip lav score">Score <b id="hud-score">0</b></span>
+            <span class="chip mint">Level <b id="hud-level">1</b></span>
+            {% if my_best %}<span class="chip sun">🏆 Best {{ my_best }}</span>{% endif %}
+            <button class="btn btn-glass btn-sm" id="restart-btn">↺ Restart</button>
+          </div>
+        </div>
+        <div id="game-root">
+          <div class="game-over" id="start-screen">
+            <span style="font-size:4rem">{{ game.icon }}</span>
+            <h2>{{ game.title }}</h2>
+            <p class="muted" style="max-width:420px">{{ game.instructions }}</p>
+            <button class="btn btn-primary btn-lg" id="start-btn">▶ Play</button>
+          </div>
+        </div>
+        <div class="touch-pad" id="touch-pad"></div>
+      </div>
+      <aside>
+        <div class="card mb-2">
+          <h3>How to play</h3>
+          <p class="muted small mt-1">{{ game.instructions }}</p>
+          <p class="small mt-1">{{ game.description }}</p>
+        </div>
+        <div class="card mb-2">
+          <h3 class="mb-1">🏆 Leaderboard</h3>
+          {% for name, avatar, best in board %}
+            <div class="lb-row"><span class="rank">{{ loop.index }}</span><span class="name">{{ avatar }} {{ name }}</span><b>{{ best }}</b></div>
+          {% else %}<p class="muted small">No scores yet. Be the first!</p>{% endfor %}
+          {% if not current_user.is_authenticated %}<p class="small mt-1"><a href="{{ url_for('auth.login', next=request.path) }}">Log in</a> to save your score.</p>{% endif %}
+        </div>
+        <div class="card">
+          <h3 class="mb-1">More games</h3>
+          {% for o in others %}<a class="list-row" href="{{ url_for('games.play', slug=o.slug) }}">{{ o.icon }} {{ o.title }}</a>{% endfor %}
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>window.GAME_SLUG = {{ game.slug|tojson }};</script>
+<script src="{{ url_for('static', filename='js/games/kit.js') }}"></script>
+<script src="{{ url_for('static', filename='js/games/' ~ game.slug ~ '.js') }}"></script>
+<script>GameKit.boot();</script>
+{% endblock %}

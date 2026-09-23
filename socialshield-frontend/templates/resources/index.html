@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Resources{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <span class="eyebrow">📚 Learn at your own pace</span>
+    <h1>Resources for <span class="grad-text">quiet growth</span></h1>
+    <p>{{ books|length }} books, {{ skills|length }} skills, {{ defense|length }} safety tutorials, plus articles, talks, podcasts, apps and helplines.</p>
+  </div>
+</section>
+
+<section style="padding-top:1rem">
+  <div class="container">
+    <div class="tabs glass" data-tabs>
+      <button class="tab active" data-tab="books">📚 Books</button>
+      <button class="tab" data-tab="skills">💪 Skills</button>
+      <button class="tab" data-tab="defense">🛡️ Self-Defense</button>
+      <button class="tab" data-tab="media">🎧 Articles &amp; Media</button>
+      <button class="tab" data-tab="help">☎️ Helplines</button>
+    </div>
+
+    <!-- Books -->
+    <div class="tab-panel active" id="books">
+      <div class="flex between mb-2">
+        <div class="flex" data-filter="book">
+          <button class="chip active" data-val="">All</button>
+          {% for c in book_cats %}<button class="chip" data-val="{{ c }}">{{ c }}</button>{% endfor %}
+          {% if current_user.is_authenticated %}<button class="chip" data-val="__mine">📌 My list</button>{% endif %}
+        </div>
+        <input class="input" placeholder="Search books or authors…" data-search="book" style="max-width:260px">
+      </div>
+      <div class="auto-grid sm">
+        {% for b in books %}
+        {% set c1, c2 = b.cover.split(',') %}
+        <div class="card hover book-card" data-item="book" data-cat="{{ b.category }}" data-mine="{{ '1' if b.id in my_books }}" data-text="{{ (b.title ~ ' ' ~ b.author)|lower }}">
+          <a href="{{ url_for('resources.book', book_id=b.id) }}" class="book-cover" style="background:linear-gradient(135deg,{{ c1 }},{{ c2 }})">
+            <span class="spine"></span>
+            {% if b.free %}<span class="chip mint free-tag">Free</span>{% endif %}
+            <h4>{{ b.title }}</h4><small class="muted">{{ b.author }}</small>
+          </a>
+          <div class="book-body">
+            <div class="flex"><span class="chip lav">{{ b.category }}</span>{% if b.id in my_books %}<span class="chip pink">{{ {'want':'📌 Want','reading':'📖 Reading','finished':'✅ Done'}[my_books[b.id]] }}</span>{% endif %}</div>
+            <p>{{ b.description }}</p>
+            <div class="flex">
+              <a href="{{ url_for('resources.book', book_id=b.id) }}" class="btn btn-glass btn-sm">Details</a>
+              <a href="{{ b.read_url }}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">{{ '📖 Read free' if b.free else '🔎 Preview' }}</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="tab-panel" id="skills">
+      <div class="flex between mb-2">
+        <div class="flex" data-filter="skill">
+          <button class="chip active" data-val="">All</button>
+          {% for c in skill_cats %}<button class="chip" data-val="{{ c }}">{{ c }}</button>{% endfor %}
+        </div>
+        <input class="input" placeholder="Search skills…" data-search="skill" style="max-width:260px">
+      </div>
+      <p class="muted mb-2">Click any skill to see full details, step-by-step guidance and a practice challenge, so you can choose what's right for you.</p>
+      <div class="auto-grid">
+        {% for s in skills %}
+        <a href="{{ url_for('resources.skill', skill_id=s.id) }}" class="card hover skill-card" data-item="skill" data-cat="{{ s.category }}" data-text="{{ (s.name ~ ' ' ~ s.summary)|lower }}">
+          <div class="si">{{ s.icon }}</div>
+          <div>
+            <h3>{{ s.name }}</h3>
+            <p class="muted small">{{ s.summary }}</p>
+            <div class="flex mt-1"><span class="chip lav">{{ s.category }}</span><span class="chip {{ {'beginner':'mint','intermediate':'sun','advanced':'pink'}[s.difficulty] }}">{{ s.difficulty }}</span></div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Defense -->
+    <div class="tab-panel" id="defense">
+      <div class="flex mb-2" data-filter="def">
+        <button class="chip active" data-val="">All</button>
+        {% for c in defense_cats %}<button class="chip" data-val="{{ c }}">{{ {'verbal':'🗣️ Verbal','body-language':'🧍 Body language','physical':'🥋 Physical','awareness':'🧭 Awareness'}.get(c, c) }}</button>{% endfor %}
+      </div>
+      <div class="flash flash-info glass mb-2">💜 The goal of self-defense is always to <b>escape and get to safety</b>, not to fight. Practise physical moves with a trained instructor when you can.</div>
+      <div class="auto-grid">
+        {% for d in defense %}
+        <a href="{{ url_for('resources.defense', item_id=d.id) }}" class="card hover skill-card" data-item="def" data-cat="{{ d.category }}" data-text="{{ d.title|lower }}">
+          <div class="si" style="background:var(--grad-sky)">{{ d.icon }}</div>
+          <div>
+            <h3>{{ d.title }}</h3>
+            <p class="muted small">{{ d.summary }}</p>
+            <div class="flex mt-1"><span class="chip sky">{{ d.category }}</span><span class="chip">⏱ {{ d.duration_minutes }} min</span><span class="chip mint">{{ d.difficulty }}</span></div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Media -->
+    <div class="tab-panel" id="media">
+      {% for kind in ['article','video','podcast','app','worksheet'] %}{% if res_groups.get(kind) %}
+        <h2 class="mb-2 mt-3">{{ {'article':'📰 Articles','video':'🎬 Talks & Videos','podcast':'🎧 Podcasts','app':'📱 Helpful Apps','worksheet':'📝 Worksheets'}[kind] }}</h2>
+        <div class="auto-grid">
+          {% for r in res_groups[kind] %}
+          <a href="{{ r.url }}" target="_blank" rel="noopener" class="card hover res-item"><span class="ri">{{ r.icon }}</span><div><h4>{{ r.title }}</h4><p class="muted small">{{ r.description }}</p></div></a>
+          {% endfor %}
+        </div>
+      {% endif %}{% endfor %}
+    </div>
+
+    <!-- Help -->
+    <div class="tab-panel" id="help">
+      <div class="flash flash-warning glass mb-2">🚨 If you or someone else is in immediate danger in Bangladesh, call <b><a href="tel:999">999</a></b> now.</div>
+      <div class="auto-grid">
+        {% for r in res_groups.get('helpline', []) %}
+        <a href="{{ r.url }}" {% if not r.url.startswith('tel:') %}target="_blank" rel="noopener"{% endif %} class="card hover res-item"><span class="ri">{{ r.icon }}</span><div><h4>{{ r.title }}</h4><p class="muted small">{{ r.description }}</p></div></a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  // category chips + search per list (book / skill / def)
+  const state = {};
+  function apply(kind) {
+    const s = state[kind] || {};
+    document.querySelectorAll(`[data-item="${kind}"]`).forEach(el => {
+      const catOk = !s.cat || (s.cat === '__mine' ? el.dataset.mine === '1' : el.dataset.cat === s.cat);
+      const txtOk = !s.q || el.dataset.text.includes(s.q);
+      el.style.display = catOk && txtOk ? '' : 'none';
+    });
+  }
+  document.querySelectorAll('[data-filter]').forEach(group => {
+    const kind = group.dataset.filter;
+    group.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+      group.querySelectorAll('.chip').forEach(x => x.classList.remove('active')); b.classList.add('active');
+      state[kind] = { ...(state[kind] || {}), cat: b.dataset.val }; apply(kind);
+    }));
+  });
+  document.querySelectorAll('[data-search]').forEach(inp => inp.addEventListener('input', () => {
+    const kind = inp.dataset.search; state[kind] = { ...(state[kind] || {}), q: inp.value.toLowerCase().trim() }; apply(kind);
+  }));
+</script>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Suggest an event{% endblock %}
+{% block content %}
+<div class="auth-wrap container">
+  <form class="auth-card wide glass" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <span class="auth-emoji">🌱</span>
+    <h1>Suggest a calm event</h1>
+    <p class="sub">Help fellow introverts discover gentle places to be.</p>
+    <div class="form-group"><label>Title</label><input class="input" name="title" required value="{{ form.get('title','') }}"></div>
+    <div class="form-group"><label>Description</label><textarea class="input" name="description">{{ form.get('description','') }}</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>Category</label><select class="input" name="category">{% for c in categories %}<option {{ 'selected' if form.get('category') == c }}>{{ c }}</option>{% endfor %}</select></div>
+      <div class="form-group"><label>Start</label><input class="input" type="datetime-local" name="start_time" required value="{{ form.get('start_time','') }}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Venue</label><input class="input" name="venue" required value="{{ form.get('venue','') }}"></div>
+      <div class="form-group"><label>Area</label><input class="input" name="area" value="{{ form.get('area','Dhanmondi') }}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Duration (minutes)</label><input class="input" type="number" name="duration" value="{{ form.get('duration', 120) }}" min="15" max="600"></div>
+      <div class="form-group"><label>Price (৳)</label><input class="input" type="number" name="price" value="{{ form.get('price', 0) }}" min="0"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Crowd size</label><select class="input" name="crowd_size">{% for c in crowds %}<option value="{{ c }}" {{ 'selected' if form.get('crowd_size','small') == c }}>{{ c|capitalize }}</option>{% endfor %}</select></div>
+      <div class="form-group"><label>Capacity</label><input class="input" type="number" name="capacity" value="{{ form.get('capacity', 20) }}" min="2"></div>
+    </div>
+    <div class="form-group"><label>Noise level: <span class="range-val" id="nl"></span></label><input type="range" name="noise_level" min="1" max="5" value="{{ form.get('noise_level', 2) }}" data-out="#nl" data-suffix="/5"></div>
+    <div class="form-group"><label>Organiser</label><input class="input" name="organizer" value="{{ form.get('organizer','') }}"></div>
+    <div class="flex mb-3">
+      <label class="check"><input type="checkbox" name="quiet_zone" value="1" checked> 🤫 Has quiet zone</label>
+      <label class="check"><input type="checkbox" name="easy_exit" value="1" checked> 🚪 Easy exit</label>
+      <label class="check"><input type="checkbox" name="structured" value="1"> 📋 Structured activity</label>
+    </div>
+    <button class="btn btn-primary btn-block">Publish event</button>
+  </form>
+</div>
+{% endblock %}

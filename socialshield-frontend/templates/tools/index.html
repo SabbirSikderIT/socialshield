@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}Survival Tools{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <span class="eyebrow">🧰 Social survival kit</span>
+    <h1>Tools for <span class="grad-text">every awkward moment</span></h1>
+    <p>Fake calls, exit excuses, conversation starters, calming exercises and dozens of practical tips, all in one pocket-sized place.</p>
+  </div>
+</section>
+
+<section style="padding-top:1rem">
+  <div class="container">
+    <nav class="tool-nav">
+      <a class="chip lav" href="#fakecall">📞 Fake Call</a>
+      <a class="chip pink" href="#excuses">🚪 Exit Excuses</a>
+      <a class="chip sun" href="#starters">💬 Conversation Starters</a>
+      <a class="chip mint" href="#breathe">🌬️ Breathing</a>
+      <a class="chip sky" href="#ground">🖐️ Grounding</a>
+      <a class="chip lav" href="#battery">🔋 Social Battery</a>
+      <a class="chip danger" href="#panic">🆘 Panic Button</a>
+      <a class="chip pink" href="#boundary">🧱 Boundary Builder</a>
+      <a class="chip sun" href="#checklist">✅ Pre-event Checklist</a>
+      <a class="chip mint" href="#tips">💡 Tips</a>
+    </nav>
+
+    <!-- Fake call -->
+    <div class="card tool-card mb-3" id="fakecall">
+      <div class="flex between">
+        <div><h2>📞 Fake Call Simulator</h2><p class="muted">Pick a caller, set a delay, put your phone face down and wait for your rescue.</p></div>
+        <span class="chip lav">{{ calls|length }} scripts</span>
+      </div>
+      <div class="flex mt-2" id="call-filter"></div>
+      <div class="caller-grid" id="caller-grid"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Or use a custom caller name</label><input class="input" id="custom-caller" placeholder="e.g. Rahim Bhai"></div>
+        <div class="form-group"><label>Ring after</label>
+          <select class="input" id="call-delay"><option value="0">Right now</option><option value="5">5 seconds</option><option value="15">15 seconds</option><option value="30">30 seconds</option><option value="60">1 minute</option><option value="300">5 minutes</option><option value="900">15 minutes</option></select></div>
+      </div>
+      <div class="flex">
+        <label class="check"><input type="checkbox" id="call-voice" checked> 🔊 Read the caller's voice aloud</label>
+        <label class="check"><input type="checkbox" id="call-vibrate" checked> 📳 Vibrate (mobile)</label>
+      </div>
+      <div class="flex mt-2">
+        <button class="btn btn-primary btn-lg" id="start-call">📲 Schedule fake call</button>
+        <span class="muted" id="call-countdown"></span>
+      </div>
+    </div>
+
+    <div class="grid grid-2 mb-3">
+      <!-- Exit excuses -->
+      <div class="card tool-card" id="excuses">
+        <h2>🚪 Exit Excuse Generator</h2>
+        <p class="muted">Need to leave? Pick a flavour.</p>
+        <div class="flex mt-2" id="excuse-cats">
+          <button class="chip active" data-cat="">All</button>
+          {% for c in excuse_cats %}<button class="chip" data-cat="{{ c }}">{{ c }}</button>{% endfor %}
+        </div>
+        <div class="excuse-display" id="excuse-text">Tap "Generate" for your escape line ✨</div>
+        <div class="flex between">
+          <span class="small muted" id="excuse-believe"></span>
+          <div class="flex"><button class="btn btn-glass btn-sm" id="excuse-copy">📋 Copy</button><button class="btn btn-primary" id="excuse-gen">🎲 Generate</button></div>
+        </div>
+      </div>
+
+      <!-- Social battery -->
+      <div class="card tool-card" id="battery">
+        <h2>🔋 Social Battery Meter</h2>
+        <p class="muted">How much social energy do you have left? {% if current_user.is_authenticated %}We'll remember it.{% endif %}</p>
+        <div class="battery mt-2"><i id="batt-fill"></i></div>
+        <div class="flex between mt-1"><b class="fredoka" id="batt-val" style="font-size:1.6rem"></b><span id="batt-msg" class="muted"></span></div>
+        <input type="range" id="batt-range" min="0" max="100" value="{{ current_user.social_battery if current_user.is_authenticated else 70 }}">
+        <div class="flex mt-1 small">
+          <button class="chip" data-drain="15">🗣️ Small talk −15</button>
+          <button class="chip" data-drain="25">🎉 Party hour −25</button>
+          <button class="chip" data-drain="-20">📖 Read alone +20</button>
+          <button class="chip" data-drain="-35">😴 Nap +35</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Starters -->
+    <div class="card tool-card mb-3" id="starters">
+      <div class="flex between">
+        <div><h2>💬 Conversation Starter Templates</h2><p class="muted">Click any card to copy it. Each comes with a follow-up to keep things flowing.</p></div>
+        <div class="flex"><input class="input" id="starter-search" placeholder="Search starters…" style="width:220px"><button class="btn btn-primary btn-sm" id="starter-random">🎲 Surprise me</button></div>
+      </div>
+      <div class="flex mt-2 mb-2" id="starter-cats">
+        <button class="chip active" data-cat="">All ({{ starters|length }})</button>
+        {% for c in starter_cats %}<button class="chip" data-cat="{{ c }}">{{ c }}</button>{% endfor %}
+      </div>
+      <div class="starter-grid" id="starter-grid"></div>
+    </div>
+
+    <div class="grid grid-2 mb-3">
+      <!-- Breathing -->
+      <div class="card tool-card" id="breathe">
+        <h2>🌬️ Box Breathing</h2>
+        <p class="muted">4 seconds in, 4 hold, 4 out, 4 hold. Follow the blob.</p>
+        <div class="breath-stage"><div class="breath-circle" id="breath-circle">Ready?</div></div>
+        <div class="flex between"><span class="muted" id="breath-count">0 cycles</span><button class="btn btn-mint" id="breath-btn">▶ Start</button></div>
+      </div>
+
+      <!-- Grounding -->
+      <div class="card tool-card" id="ground">
+        <h2>🖐️ 5-4-3-2-1 Grounding</h2>
+        <p class="muted mb-2">Bring yourself back to the present, one sense at a time.</p>
+        <div id="ground-steps">
+          <div class="ground-step"><b>5</b>👀 things you can see<input class="input" placeholder="e.g. a lamp, a plant…"></div>
+          <div class="ground-step"><b>4</b>✋ things you can touch<input class="input"></div>
+          <div class="ground-step"><b>3</b>👂 things you can hear<input class="input"></div>
+          <div class="ground-step"><b>2</b>👃 things you can smell<input class="input"></div>
+          <div class="ground-step"><b>1</b>👅 thing you can taste<input class="input"></div>
+        </div>
+        <button class="btn btn-glass btn-sm" id="ground-done">🌷 I feel a little calmer</button>
+      </div>
+    </div>
+
+    <div class="grid grid-2 mb-3">
+      <!-- Panic -->
+      <div class="card tool-card center" id="panic">
+        <h2>🆘 Panic Button</h2>
+        <p class="muted">Overwhelmed right now? Press it. We'll handle the next step.</p>
+        <div class="breath-stage"><button class="panic-btn" id="panic-btn">I need out</button></div>
+        <div class="flex" style="justify-content:center" id="panic-options" hidden>
+          <button class="btn btn-primary btn-sm" data-panic="call">📞 Instant fake call</button>
+          <button class="btn btn-mint btn-sm" data-panic="breathe">🌬️ Breathe with me</button>
+          <button class="btn btn-sun btn-sm" data-panic="excuse">🚪 Give me an excuse</button>
+          <a class="btn btn-danger btn-sm" href="tel:999">🚨 Call 999</a>
+        </div>
+      </div>
+
+      <!-- Boundary builder -->
+      <div class="card tool-card" id="boundary">
+        <h2>🧱 Boundary Phrase Builder</h2>
+        <p class="muted mb-2">Build a polite, firm sentence for any situation.</p>
+        <div class="form-group"><label>Situation</label>
+          <select class="input" id="bd-sit">
+            <option value="question">Someone asks a personal question</option>
+            <option value="touch">Someone is too physically close</option>
+            <option value="invite">An invitation you don't want</option>
+            <option value="talk">A conversation that won't end</option>
+            <option value="photo">Someone wants a photo with you</option>
+            <option value="favour">A favour you can't do</option>
+          </select></div>
+        <div class="form-group"><label>Tone</label>
+          <select class="input" id="bd-tone"><option value="soft">Soft 🌸</option><option value="firm">Firm 🧱</option><option value="funny">Funny 😄</option></select></div>
+        <div class="excuse-display" id="bd-out" style="font-size:1.15rem">Your phrase will appear here</div>
+        <div class="flex"><button class="btn btn-primary" id="bd-gen">✨ Build phrase</button><button class="btn btn-glass btn-sm" id="bd-copy">📋 Copy</button></div>
+      </div>
+    </div>
+
+    <!-- Checklist -->
+    <div class="card tool-card mb-3" id="checklist">
+      <div class="flex between"><h2>✅ Pre-event Checklist</h2><span class="chip mint" id="check-progress">0 / 10</span></div>
+      <p class="muted mb-2">Tick these off before you leave home. Saved on this device.</p>
+      <div class="grid grid-2 checklist" id="check-list">
+        {% for item in ['📍 Checked the venue & exits','🚗 Planned my ride home','🔋 Phone is charged (and power bank packed)','💬 Picked 2 conversation starters','📞 Fake call scheduled / ready','⏰ Decided how long I will stay','👕 Wearing my comfort outfit','🤗 Told a friend where I will be','💧 Had water and a snack','💜 Reminded myself: I can leave anytime'] %}
+        <label><input type="checkbox"><span>{{ item }}</span></label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div id="tips">
+      <div class="section-head"><span class="eyebrow">💡 Suggestions</span><h2>Tips from quiet experts</h2><p class="muted">{{ tip_groups.values()|map('length')|sum }} practical suggestions for before, during and after social events.</p></div>
+      <div class="tabs glass" data-tabs>
+        {% for cat in tip_groups %}<button class="tab {{ 'active' if loop.first }}" data-tab="tip-{{ loop.index }}">{{ cat }}</button>{% endfor %}
+      </div>
+      {% for cat, items in tip_groups.items() %}
+      <div class="tab-panel {{ 'active' if loop.first }}" id="tip-{{ loop.index }}">
+        <div class="auto-grid">
+          {% for t in items %}<div class="card tip-card hover"><span class="ti">{{ t.icon }}</span><h4>{{ t.title }}</h4><p>{{ t.content }}</p></div>{% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Phone overlay -->
+<div class="phone-overlay" id="phone-overlay">
+  <div class="phone" id="phone">
+    <div class="notch"></div>
+    <div class="ph-avatar" id="ph-avatar">👩</div>
+    <h3 id="ph-name">Mom</h3>
+    <div class="ph-status" id="ph-status">Incoming call…</div>
+    <div class="ph-script" id="ph-script"></div>
+    <div class="ph-actions">
+      <button class="ph-btn ph-decline" id="ph-decline" aria-label="End call">📵</button>
+      <button class="ph-btn ph-accept" id="ph-accept" aria-label="Answer">📞</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  window.SS_DATA = {
+    calls: {{ calls|tojson }},
+    starters: {{ starters|tojson }},
+    excuses: {{ excuses|tojson }},
+    loggedIn: {{ 'true' if current_user.is_authenticated else 'false' }}
+  };
+</script>
+<script src="{{ url_for('static', filename='js/tools.js') }}"></script>
+{% endblock %}

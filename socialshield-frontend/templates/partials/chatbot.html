@@ -1,0 +1,29 @@
+<div class="chatbot" id="chatbot">
+  <button class="chat-fab" id="chat-fab" aria-label="Open chat assistant">
+    <span class="chat-fab-icon">💬</span><span class="chat-fab-close">✕</span>
+    <span class="chat-ping"></span>
+  </button>
+  <section class="chat-panel glass" id="chat-panel" aria-label="Shelly chat assistant" hidden>
+    <header class="chat-head">
+      <div class="chat-avatar">🌸</div>
+      <div>
+        <strong>Shelly</strong>
+        <small id="chat-status">Your quiet companion · online</small>
+      </div>
+      <button class="chat-reset" id="chat-reset" title="Start a new chat">↺</button>
+    </header>
+    <div class="chat-body" id="chat-body">
+      <div class="msg bot">Hi {{ current_user.full_name.split(' ')[0] if current_user.is_authenticated and current_user.full_name else 'friend' }} 🌷 I'm Shelly. Ask me anything about Social Shield: events, fake calls, conversation starters, games, safety… or just say hi.</div>
+    </div>
+    <div class="chat-suggest" id="chat-suggest">
+      <button>Find a quiet event</button>
+      <button>How does fake call work?</button>
+      <button>Give me a conversation starter</button>
+      <button>I feel anxious</button>
+    </div>
+    <form class="chat-form" id="chat-form">
+      <input id="chat-input" autocomplete="off" placeholder="Type softly…" maxlength="1500" aria-label="Message">
+      <button class="btn btn-primary" aria-label="Send">➤</button>
+    </form>
+  </section>
+</div>

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+{% set u = current_user %}
+<section style="padding-top:1.5rem">
+  <div class="container grid grid-2" style="align-items:start">
+    <form class="card" method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <h2 class="mb-2">⚙️ Edit profile</h2>
+      <div class="form-group"><label>Username</label><input class="input" value="{{ u.username }}" disabled></div>
+      <div class="form-group"><label>Email</label><input class="input" value="{{ u.email }}" disabled></div>
+      <div class="form-row">
+        <div class="form-group"><label>Full name</label><input class="input" name="full_name" value="{{ u.full_name or '' }}"></div>
+        <div class="form-group"><label>City</label><input class="input" name="city" value="{{ u.city or '' }}"></div>
+      </div>
+      <div class="form-group"><label>Bio</label><textarea class="input" name="bio" maxlength="500">{{ u.bio or '' }}</textarea></div>
+      <div class="form-group"><label>Avatar</label>
+        <div class="avatar-pick">{% for a in avatars %}<label><input type="radio" name="avatar" value="{{ a }}" {{ 'checked' if u.avatar == a }}><span>{{ a }}</span></label>{% endfor %}</div></div>
+      <div class="form-group"><label>Social comfort level</label>
+        <select class="input" name="introversion_level">
+          {% for v, l in [('low','🙂 Somewhat comfortable'),('medium','😬 Nervous'),('high','😰 Very challenging'),('extreme','🏠 Avoid whenever possible')] %}
+          <option value="{{ v }}" {{ 'selected' if u.introversion_level == v }}>{{ l }}</option>{% endfor %}</select></div>
+      <div class="form-group"><label>Trigger zones</label>
+        <div class="check-grid">{% for t in triggers %}<label class="check-pill"><input type="checkbox" name="triggers" value="{{ t.id }}" {{ 'checked' if t in u.triggers }}><span>{{ t.icon }} {{ t.name }}</span></label>{% endfor %}</div></div>
+      <button class="btn btn-primary">Save changes</button>
+    </form>
+
+    <div>
+      <form class="card mb-3" method="post" action="{{ url_for('auth.change_password') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <h2 class="mb-2">🔐 Change password</h2>
+        <div class="form-group"><label>Current password</label><div class="pw-field"><input class="input" type="password" name="current" required><button type="button" class="pw-toggle">👁️</button></div></div>
+        <div class="form-group"><label>New password</label><div class="pw-field"><input class="input" type="password" name="password" required minlength="8" data-strength="#pwm2"><button type="button" class="pw-toggle">👁️</button></div><div class="pw-meter"><i id="pwm2"></i></div></div>
+        <div class="form-group"><label>Confirm new password</label><div class="pw-field"><input class="input" type="password" name="confirm" required minlength="8"><button type="button" class="pw-toggle">👁️</button></div></div>
+        <button class="btn btn-primary">Update password</button>
+      </form>
+      <form class="card" method="post" action="{{ url_for('dashboard.delete_account') }}" onsubmit="return confirm('Delete your account and all your data permanently?')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <h2 class="mb-1">🍂 Delete account</h2>
+        <p class="muted small mb-2">This permanently removes your profile, moods, reflections, RSVPs and scores.</p>
+        <div class="form-group"><input class="input" type="password" name="password" placeholder="Confirm with your password" required></div>
+        <button class="btn btn-danger">Delete my account</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

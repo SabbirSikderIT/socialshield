@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Privacy Policy{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><span class="eyebrow">🔒 Privacy</span><h1>Privacy Policy</h1><p>Your quiet is sacred, and so is your data.</p></div></section>
+<section style="padding-top:1rem"><div class="container" style="max-width:860px"><div class="card prose">
+  <h2>What we collect</h2>
+  <ul><li>Account details: username, email, optional name, city and avatar.</li><li>Preferences: introversion level, trigger zones and goals.</li><li>Activity: RSVPs, ratings, creep reports, mood logs, reflections, reading list and game scores.</li><li>Chat messages you send to Shelly, used to keep the conversation going.</li></ul>
+  <h2>How we use it</h2>
+  <p>Only to run Social Shield's features: personalised suggestions, progress charts and leaderboards. We never sell your data.</p>
+  <h2>Who can see it</h2>
+  <p>Mood logs, reflections and goals are private to you. Ratings show your username; creep reports are anonymous by default. Leaderboards show your username and avatar.</p>
+  <h2>Chatbot</h2>
+  <p>Messages to Shelly are sent to Google's Gemini API to generate replies. Please don't share sensitive personal information in chat.</p>
+  <h2>Passwords</h2>
+  <p>Passwords are stored as salted hashes. Reset codes are hashed, expire after 15 minutes and lock after 5 wrong attempts.</p>
+  <h2>Your rights</h2>
+  <p>You can edit your profile at any time and permanently delete your account (and all related data) from your profile page.</p>
+</div></div></section>
+{% endblock %}

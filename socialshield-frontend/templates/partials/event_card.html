@@ -1,0 +1,21 @@
+{% set st = e.stats() %}
+{% set comfort_v = comfort if comfort is defined and comfort is not none else st.comfort %}
+{% set creep_v = creep if creep is defined and creep is not none else st.creep %}
+<a href="{{ url_for('events.detail', event_id=e.id) }}" class="card hover event-card reveal">
+  <div class="event-cover cover-{{ e.id % 6 }}">
+    <div class="date-badge"><b>{{ e.start_time.strftime('%d') }}</b><small>{{ e.start_time.strftime('%b') }}</small></div>
+    {% if alerts is defined and alerts %}<span class="chip danger alert-badge">🚨 {{ alerts }} alert{{ 's' if alerts > 1 }}</span>
+    {% elif e.quiet_zone %}<span class="chip mint alert-badge">🤫 Quiet zone</span>{% endif %}
+    {{ e.emoji }}
+  </div>
+  <div class="event-body">
+    <div class="flex"><span class="chip lav">{{ e.category }}</span>{% if e.price == 0 %}<span class="chip mint">Free</span>{% else %}<span class="chip sun">৳{{ e.price }}</span>{% endif %}</div>
+    <h3>{{ e.title }}</h3>
+    <small class="muted">🕒 {{ e.start_time|pretty_dt }} · 📍 {{ e.area }}</small>
+    <p>{{ e.description[:110] }}{% if e.description|length > 110 %}…{% endif %}</p>
+    <div class="meter bar-comfort"><label>Comfort</label><div class="bar"><i style="width:{{ ((comfort_v or 0) / 5 * 100)|round }}%"></i></div><b>{{ '%.1f'|format(comfort_v) if comfort_v else '–' }}</b></div>
+    <div class="meter bar-creep"><label>Creep risk</label><div class="bar"><i style="width:{{ ((creep_v or 0) / 5 * 100)|round }}%"></i></div><b>{{ '%.1f'|format(creep_v) if creep_v else '–' }}</b></div>
+    <div class="meter bar-noise"><label>Noise</label><div class="bar"><i style="width:{{ e.noise_level * 20 }}%"></i></div><b>{{ e.noise_level }}/5</b></div>
+    <div class="flex small muted">👥 {{ e.crowd_size|capitalize }} crowd {% if e.easy_exit %}· 🚪 Easy exit{% endif %} {% if e.structured %}· 📋 Structured{% endif %}</div>
+  </div>
+</a>

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}FAQ{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><span class="eyebrow">❓ Questions</span><h1>Frequently asked <span class="grad-text">quietly</span></h1><p>Can't find your answer? Ask Shelly in the corner, or <a href="{{ url_for('main.contact') }}">contact us</a>.</p></div></section>
+<section style="padding-top:1rem"><div class="container" style="max-width:820px">
+  {% for q, a in faq %}<details class="faq glass" {{ 'open' if loop.first }}><summary>{{ q }}</summary><p>{{ a }}</p></details>{% endfor %}
+</div></section>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ s.name }}{% endblock %}
+{% block content %}
+<section style="padding-top:1.5rem">
+  <div class="container">
+    <a href="{{ url_for('resources.index') }}#skills" class="btn btn-glass btn-sm mb-2">← All skills</a>
+    <div class="detail-layout">
+      <div class="card">
+        <div class="flex"><div class="big-avatar" style="background:var(--grad-rose)">{{ s.icon }}</div>
+          <div><h1 style="font-size:2rem">{{ s.name }}</h1>
+            <div class="flex"><span class="chip lav">{{ s.category }}</span><span class="chip {{ {'beginner':'mint','intermediate':'sun','advanced':'pink'}[s.difficulty] }}">{{ s.difficulty }}</span></div></div></div>
+        <p class="mt-2" style="font-size:1.1rem">{{ s.summary }}</p>
+        <h2 class="mt-3 mb-1">🌱 Why it matters</h2>
+        <p>{{ s.details }}</p>
+        <h2 class="mt-3 mb-2">👣 Step by step</h2>
+        <ol class="steps">{% for st in s.steps|nl2list %}<li>{{ st }}</li>{% endfor %}</ol>
+      </div>
+      <div>
+        <div class="card mb-2" style="background:linear-gradient(135deg,rgba(132,250,176,.35),rgba(143,211,244,.35))">
+          <h3>🎯 Practice challenge</h3>
+          <p class="mt-1">{{ s.practice }}</p>
+          <p class="small muted mt-1">Best for: {{ s.best_for }}</p>
+          {% if current_user.is_authenticated %}
+          <form method="post" action="{{ url_for('dashboard.goal') }}" class="mt-2">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="title" value="Practise: {{ s.name }}"><input type="hidden" name="target" value="3">
+            <button class="btn btn-primary btn-sm">➕ Add as a goal (×3)</button>
+          </form>
+          {% endif %}
+        </div>
+        <div class="card mb-2">
+          <h3>💬 Ask Shelly</h3>
+          <p class="small muted mb-1">Get personalised tips for this skill.</p>
+          <button class="btn btn-glass btn-sm" onclick="askShelly('Give me 3 personal tips to practise {{ s.name }} as an introvert')">Ask for tips</button>
+        </div>
+        {% if related %}
+        <div class="card">
+          <h3 class="mb-1">Related skills</h3>
+          {% for r in related %}<a class="list-row" href="{{ url_for('resources.skill', skill_id=r.id) }}">{{ r.icon }} {{ r.name }}</a>{% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

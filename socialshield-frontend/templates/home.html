@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="reveal">
+      <span class="eyebrow">🌙 Built for quiet souls</span>
+      <h1>Navigate social life <span class="grad-text">on your own terms.</span></h1>
+      <p class="lead">Social Shield is a soft, safe toolkit for introverts and socially anxious people. Find calm events, escape awkward moments, practise small talk and build confidence gently.</p>
+      <div class="flex">
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary btn-lg">📊 My Dashboard</a>
+        {% else %}
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">🌸 Get started free</a>
+        {% endif %}
+        <a href="{{ url_for('tools.index') }}#fakecall" class="btn btn-glass btn-lg">📞 Try a fake call</a>
+      </div>
+      <p class="muted small mt-2">No pressure. No loud notifications. Leave whenever you want.</p>
+    </div>
+    <div class="hero-art reveal">
+      <div class="hero-orb"></div><div class="hero-orb two"></div>
+      <div class="hero-shield">🛡️</div>
+      <div class="float-card fc1 glass">🔋 Social battery: 72%</div>
+      <div class="float-card fc2 glass">📞 Incoming: "Mom"</div>
+      <div class="float-card fc3 glass">🌿 Comfort rating 4.8</div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat glass reveal"><b class="grad-text" data-count="{{ stats.events }}">0</b><span>calm events</span></div>
+      <div class="stat glass reveal"><b class="grad-text" data-count="{{ stats.starters }}">0</b><span>conversation starters</span></div>
+      <div class="stat glass reveal"><b class="grad-text" data-count="{{ stats.games }}">0</b><span>cosy games</span></div>
+      <div class="stat glass reveal"><b class="grad-text" data-count="{{ stats.books }}">0</b><span>books to read</span></div>
+      <div class="stat glass reveal"><b class="grad-text" data-count="{{ stats.skills }}">0</b><span>skills to learn</span></div>
+      <div class="stat glass reveal"><b class="grad-text" data-count="{{ stats.users }}">0</b><span>quiet members</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">What's inside</span>
+      <h2>Your gentle social survival kit</h2>
+      <p class="muted">Practical tools rather than just advice, wrapped in a little humour.</p>
+    </div>
+    <div class="grid grid-3">
+      <a href="{{ url_for('events.index') }}" class="card hover reveal"><div class="feature-icon fi-1">📅</div><h3>Event Discovery</h3><p class="muted">Nearby Dhaka events rated by fellow introverts for comfort, crowd and creep-risk. Know before you go.</p></a>
+      <a href="{{ url_for('tools.index') }}#fakecall" class="card hover reveal"><div class="feature-icon fi-2">📞</div><h3>Fake Calls &amp; Exits</h3><p class="muted">A realistic incoming-call screen plus believable exit excuses at the tap of a button.</p></a>
+      <a href="{{ url_for('tools.index') }}#starters" class="card hover reveal"><div class="feature-icon fi-3">💬</div><h3>Conversation Starters</h3><p class="muted">Icebreakers for parties, classrooms, bus queues, weddings and more. Be a small-talk champion.</p></a>
+      <a href="{{ url_for('resources.index') }}#defense" class="card hover reveal"><div class="feature-icon fi-4">🛡️</div><h3>Safety &amp; Self-Defense</h3><p class="muted">Creep alerts, verbal boundary scripts, body-language tips and basic self-defense moves.</p></a>
+      <a href="{{ url_for('games.index') }}" class="card hover reveal"><div class="feature-icon fi-5">🎮</div><h3>17 Cosy Games</h3><p class="muted">Escape the Party, Awkward Dodge, Small Talk Quiz and more. Practise without pressure.</p></a>
+      <a href="{{ url_for('dashboard.index') }}" class="card hover reveal"><div class="feature-icon fi-6">📈</div><h3>Mood &amp; Progress</h3><p class="muted">Track your social battery, reflect after events and celebrate every tiny victory.</p></a>
+    </div>
+  </div>
+</section>
+
+{% if starter %}
+<section style="padding-top:0">
+  <div class="container">
+    <div class="starter-box glass reveal">
+      <span style="font-size:2.5rem">💬</span>
+      <div class="quote" id="home-starter">"{{ starter.text }}"</div>
+      <span class="chip lav" id="home-starter-cat">{{ starter.category }}</span>
+      <button class="btn btn-primary btn-sm" id="new-starter">🔄 Another</button>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section>
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Upcoming &amp; calm</span>
+      <h2>Introvert-approved events near you</h2>
+      <p class="muted">Sorted by comfort rating from our community.</p>
+    </div>
+    <div class="auto-grid">
+      {% for e in featured %}{% include "partials/event_card.html" %}{% endfor %}
+    </div>
+    <div class="center mt-3"><a href="{{ url_for('events.index') }}" class="btn btn-glass">See all events →</a></div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Play &amp; practise</span>
+      <h2>Games that get it</h2>
+    </div>
+    <div class="auto-grid sm">
+      {% for g in games %}
+      <a href="{{ url_for('games.play', slug=g.slug) }}" class="card hover game-card reveal">
+        <div class="game-thumb" style="background:linear-gradient(135deg,{{ g.colors }})"><span class="chip">{{ g.category }}</span>{{ g.icon }}</div>
+        <div class="gbody"><h3>{{ g.title }}</h3><p>{{ g.description }}</p></div>
+      </a>
+      {% endfor %}
+    </div>
+    <div class="center mt-3"><a href="{{ url_for('games.index') }}" class="btn btn-glass">All 17 games →</a></div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal"><span class="eyebrow">How it works</span><h2>Four gentle steps</h2></div>
+    <div class="grid grid-4">
+      <div class="card reveal center"><div class="feature-icon fi-1" style="margin:0 auto 1rem">🌱</div><h3>1. Create your profile</h3><p class="muted small">Pick your introversion level, trigger zones and tiny goals.</p></div>
+      <div class="card reveal center"><div class="feature-icon fi-2" style="margin:0 auto 1rem">🔍</div><h3>2. Find a calm event</h3><p class="muted small">Filter by noise, crowd, comfort and creep risk.</p></div>
+      <div class="card reveal center"><div class="feature-icon fi-3" style="margin:0 auto 1rem">🧰</div><h3>3. Bring your toolkit</h3><p class="muted small">Fake calls, starters, breathing and exit plans in your pocket.</p></div>
+      <div class="card reveal center"><div class="feature-icon fi-4" style="margin:0 auto 1rem">🌷</div><h3>4. Reflect &amp; grow</h3><p class="muted small">Log how it went and watch your confidence bloom.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head reveal"><span class="eyebrow">Kind words</span><h2>From our quiet community</h2></div>
+    <div class="grid grid-3">
+      <blockquote class="card testimonial reveal">"The fake call saved me from a 40-minute conversation about crypto. I cried with relief."<footer>🦉 Tanvir, Mirpur</footer></blockquote>
+      <blockquote class="card testimonial reveal">"I found a silent book club through the events page. I've been going every week for two months!"<footer>🌿 Nila, Dhanmondi</footer></blockquote>
+      <blockquote class="card testimonial reveal">"The conversation starters for weddings are elite. My relatives think I'm charming now."<footer>🐱 Mim, Uttara</footer></blockquote>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="cta glass reveal">
+      <h2>Ready to raise your shield? 🛡️</h2>
+      <p class="muted mb-2">Join free. You can always leave early (from events, and from this website).</p>
+      <div class="flex" style="justify-content:center">
+        {% if not current_user.is_authenticated %}<a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Create my account</a>{% endif %}
+        <button class="btn btn-glass btn-lg" onclick="askShelly('What can Social Shield do for me?')">💬 Ask Shelly</button>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  const ns = document.getElementById('new-starter');
+  ns && ns.addEventListener('click', async () => {
+    const r = await api('/api/starter');
+    document.getElementById('home-starter').textContent = '"' + r.text + '"';
+    document.getElementById('home-starter-cat').textContent = r.category;
+  });
+</script>
+{% endblock %}

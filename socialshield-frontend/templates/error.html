@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="container error-page">
+  <div class="code grad-text">{{ code }}</div>
+  <h1 class="mt-2">{{ title }}</h1>
+  <p class="muted mt-1">{{ message }}</p>
+  <div class="flex mt-3" style="justify-content:center"><a href="{{ url_for('main.home') }}" class="btn btn-primary">🏡 Take me home</a><button class="btn btn-glass" onclick="history.back()">← Go back</button></div>
+</div>
+{% endblock %}

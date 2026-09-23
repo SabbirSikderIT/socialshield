@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}Social Shield{% endblock %} · Social Shield</title>
+  <meta name="description" content="Social Shield: a calm toolkit for introverts and socially anxious people.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <div class="bg-blobs" aria-hidden="true">
+    <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+    <span class="blob b4"></span><span class="blob b5"></span>
+  </div>
+
+  {% set ep = request.endpoint or '' %}
+  <header class="nav-wrap">
+    <nav class="glass-nav container">
+      <a href="{{ url_for('main.home') }}" class="logo"><span class="logo-icon">🛡️</span> Social<b>Shield</b></a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <ul class="nav-links">
+        <li><a href="{{ url_for('main.home') }}" class="{{ 'active' if ep == 'main.home' }}">🏡 Home</a></li>
+        <li><a href="{{ url_for('events.index') }}" class="{{ 'active' if ep.startswith('events.') }}">📅 Events</a></li>
+        <li><a href="{{ url_for('tools.index') }}" class="{{ 'active' if ep.startswith('tools.') }}">🧰 Tools</a></li>
+        <li><a href="{{ url_for('resources.index') }}" class="{{ 'active' if ep.startswith('resources.') }}">📚 Resources</a></li>
+        <li><a href="{{ url_for('games.index') }}" class="{{ 'active' if ep.startswith('games.') }}">🎮 Games</a></li>
+        {% if current_user.is_authenticated %}
+          <li class="nav-user">
+            <button class="user-chip" type="button">{{ current_user.avatar }} {{ current_user.username }} ▾</button>
+            <div class="user-menu glass">
+              <a href="{{ url_for('dashboard.index') }}">📊 Dashboard</a>
+              <a href="{{ url_for('dashboard.profile') }}">⚙️ Profile</a>
+              <a href="{{ url_for('auth.logout') }}">🌙 Log out</a>
+            </div>
+          </li>
+        {% else %}
+          <li><a href="{{ url_for('auth.login') }}" class="btn btn-glass btn-sm">Log in</a></li>
+          <li><a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Join free</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  </header>
+
+  <div class="flash-stack container">
+    {% for cat, msg in get_flashed_messages(with_categories=true) %}
+      <div class="flash flash-{{ cat }} glass">
+        <span>{{ msg }}</span><button class="flash-close" aria-label="Dismiss">×</button>
+      </div>
+    {% endfor %}
+  </div>
+
+  <main>{% block content %}{% endblock %}</main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid glass">
+        <div>
+          <a href="{{ url_for('main.home') }}" class="logo"><span class="logo-icon">🛡️</span> Social<b>Shield</b></a>
+          <p class="muted">A soft, safe corner of the internet for introverts, quiet souls and anyone who'd rather be home with a book.</p>
+          <form action="{{ url_for('main.search') }}" class="footer-search">
+            <input name="q" placeholder="Search events, books, games…" aria-label="Search">
+            <button class="btn btn-primary btn-sm">🔍</button>
+          </form>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <a href="{{ url_for('events.index') }}">Events</a>
+          <a href="{{ url_for('tools.index') }}">Survival Tools</a>
+          <a href="{{ url_for('resources.index') }}">Resources</a>
+          <a href="{{ url_for('games.index') }}">Games</a>
+          <a href="{{ url_for('dashboard.index') }}">My Dashboard</a>
+        </div>
+        <div>
+          <h4>Support</h4>
+          <a href="{{ url_for('main.about') }}">About</a>
+          <a href="{{ url_for('main.faq') }}">FAQ</a>
+          <a href="{{ url_for('main.contact') }}">Contact us</a>
+          <a href="{{ url_for('main.privacy') }}">Privacy Policy</a>
+          <a href="{{ url_for('main.terms') }}">Terms of Service</a>
+        </div>
+        <div>
+          <h4>Emergency</h4>
+          <a href="tel:999">🚨 National Emergency: 999</a>
+          <a href="tel:109">💜 Women &amp; Children: 109</a>
+          <a href="https://www.kaanpeteroi.org/" target="_blank" rel="noopener">🤗 Kaan Pete Roi</a>
+          <p class="muted small">Powered by Flask · {{ db_engine }} · Gemini</p>
+        </div>
+      </div>
+      <div class="credit">
+        <p>{{ credit_text }}</p>
+        <p class="small muted">&copy; {{ now.year }} Social Shield. Made for quiet people, with love.</p>
+      </div>
+    </div>
+  </footer>
+
+  {% include "partials/chatbot.html" %}
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

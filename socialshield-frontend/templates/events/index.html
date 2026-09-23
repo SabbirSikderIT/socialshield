@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Events{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <span class="eyebrow">📅 Nearby &amp; gentle</span>
+    <h1>Find events that <span class="grad-text">feel safe</span></h1>
+    <p>Every event is rated by introverts for comfort, crowd and creep risk. Filter by what matters to you, and leave whenever you like.</p>
+    {% if current_user.is_authenticated %}<a href="{{ url_for('events.new') }}" class="btn btn-primary mt-2">➕ Suggest an event</a>{% endif %}
+  </div>
+</section>
+
+<section style="padding-top:1rem">
+  <div class="container">
+    <div class="filter-bar glass">
+      <form method="get">
+        <div><label class="label">Search</label><input class="input" name="q" value="{{ args.get('q','') }}" placeholder="Book club, yoga, Dhanmondi…"></div>
+        <div><label class="label">Category</label>
+          <select class="input" name="category"><option value="">All</option>
+            {% for c in categories %}<option {{ 'selected' if args.get('category') == c }}>{{ c }}</option>{% endfor %}</select></div>
+        <div><label class="label">Area</label>
+          <select class="input" name="area"><option value="">Anywhere</option>
+            {% for a in areas %}<option {{ 'selected' if args.get('area') == a }}>{{ a }}</option>{% endfor %}</select></div>
+        <div><label class="label">Crowd</label>
+          <select class="input" name="crowd"><option value="">Any size</option>
+            {% for c in crowds %}<option value="{{ c }}" {{ 'selected' if args.get('crowd') == c }}>{{ c|capitalize }}</option>{% endfor %}</select></div>
+        <div><label class="label">Sort by</label>
+          <select class="input" name="sort">
+            {% for v, l in [('date','Soonest'),('comfort','Most comfortable'),('safe','Lowest creep risk'),('quiet','Quietest')] %}
+            <option value="{{ v }}" {{ 'selected' if args.get('sort','date') == v }}>{{ l }}</option>{% endfor %}</select></div>
+        <div class="extra">
+          <div style="min-width:180px"><label class="label">Max noise: <span class="range-val" id="noise-out"></span></label>
+            <input type="range" name="max_noise" min="1" max="5" value="{{ args.get('max_noise', 5) }}" data-out="#noise-out" data-suffix="/5"></div>
+          <div style="min-width:180px"><label class="label">Min comfort: <span class="range-val" id="comfort-out"></span></label>
+            <input type="range" name="min_comfort" min="0" max="5" step="0.5" value="{{ args.get('min_comfort', 0) }}" data-out="#comfort-out"></div>
+          <div style="min-width:180px"><label class="label">Max creep risk: <span class="range-val" id="creep-out"></span></label>
+            <input type="range" name="max_creep" min="1" max="5" step="0.5" value="{{ args.get('max_creep', 5) }}" data-out="#creep-out"></div>
+          <label class="check"><input type="checkbox" name="quiet" value="1" {{ 'checked' if args.get('quiet') }}> 🤫 Quiet zone</label>
+          <label class="check"><input type="checkbox" name="free" value="1" {{ 'checked' if args.get('free') }}> 💚 Free only</label>
+          <label class="check"><input type="checkbox" name="when" value="all" {{ 'checked' if args.get('when') == 'all' }}> Include past</label>
+          <div class="flex" style="margin-left:auto">
+            <a href="{{ url_for('events.index') }}" class="btn btn-glass btn-sm">Reset</a>
+            <button class="btn btn-primary btn-sm">Apply filters</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="flex between mb-2">
+      <p class="muted">{{ rows|length }} event{{ 's' if rows|length != 1 }} found</p>
+      <div class="flex small">
+        <span class="chip mint">Comfort: higher = calmer</span><span class="chip danger">Creep risk: lower = safer</span>
+      </div>
+    </div>
+
+    {% if rows %}
+    <div class="auto-grid">
+      {% for row in rows %}
+        {% set e = row[0] %}{% set comfort = row[1] %}{% set creep = row[2] %}{% set alerts = alert_counts.get(e.id, 0) %}
+        {% include "partials/event_card.html" %}
+      {% endfor %}
+    </div>
+    {% else %}
+      <div class="empty glass"><span class="e">🍃</span><h3>No events match those filters</h3><p>Try widening your search. Sometimes the best event is staying home.</p></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

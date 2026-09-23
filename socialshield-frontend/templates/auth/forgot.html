@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Forgot password{% endblock %}
+{% block content %}
+<div class="auth-wrap container">
+  <form class="auth-card glass" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <span class="auth-emoji">🔑</span>
+    <h1>Forgot password?</h1>
+    <p class="sub">It happens to the best of us. Enter your email and we'll send a 6-digit code.</p>
+    <div class="form-group"><label>Email</label><input class="input" type="email" name="email" required autofocus></div>
+    <button class="btn btn-primary btn-block btn-lg">Send reset code</button>
+    <p class="center mt-2"><a href="{{ url_for('auth.login') }}">← Back to log in</a></p>
+    <div class="flex mt-3" style="justify-content:center;gap:.4rem"><span class="chip lav">1 Email</span>→<span class="chip">2 Code</span>→<span class="chip">3 New password</span></div>
+  </form>
+</div>
+{% endblock %}
