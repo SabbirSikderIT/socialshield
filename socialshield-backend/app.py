@@ -115,6 +115,14 @@ def create_app():
     for bp in (main_bp, auth_bp, events_bp, tools_bp, res_bp, games_bp, dash_bp, api_bp):
         app.register_blueprint(bp)
 
+    # ==========================================
+    # 👇 নতুন যোগ করা Health Check Route (৮৪ নম্বর লাইনের দিকে)
+    # ==========================================
+    @app.route('/health')
+    def health():
+        return "OK", 200
+    # ==========================================
+
     @app.errorhandler(404)
     def not_found(e):
         return render_template("error.html", code=404, title="Lost in the crowd?",
