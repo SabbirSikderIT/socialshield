@@ -1,4 +1,4 @@
-# 🛡️ Social Shield
+# Social Shield
 
 A calm, database-driven social app for introverts, socially anxious and antisocial people —
 built as a DBMS course project.
@@ -25,7 +25,7 @@ DBMS/
 ├── README.md                    This file
 ├── run.bat                      Double-click to install deps and start the app
 ├── .gitignore
-├── database/
+├── socialshield-database/
 │   └── schema.sql               Hand-written PostgreSQL DDL, views, a trigger and example queries
 │
 ├── socialshield-backend/        Python / Flask application (see its own README.md)
@@ -122,7 +122,7 @@ This drops and recreates all tables, then reseeds them with fresh sample data.
 
 ## Notes for the report / viva
 
-`database/schema.sql` documents the same schema as plain PostgreSQL DDL (independent of
+`socialshield-database/schema.sql` documents the same schema as plain PostgreSQL DDL (independent of
 the ORM), including three views (`v_event_safety`, `v_leaderboard`, `v_user_progress`), a
 trigger that syncs a user's social battery from their latest mood log, and example queries
 useful for a DBMS report or viva.

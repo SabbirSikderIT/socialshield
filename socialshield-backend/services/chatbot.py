@@ -128,7 +128,7 @@ FALLBACK = [
     (("password", "forgot", "reset", "login", "account", "register", "sign"), "Log in at **/login**. Forgot your password? Go to **/forgot-password** and we'll email you a 6-digit code (valid for 15 minutes) 🔐."),
     (("anxious", "anxiety", "panic", "overwhelm", "nervous", "stress"), "That sounds heavy. Let's breathe together 🌬️: in for 4, hold for 4, out for 4, hold for 4. The guided breathing and 5-4-3-2-1 grounding tools are in **/tools**. You're doing better than you think."),
     (("mood", "progress", "track", "dashboard", "reflect"), "Your personal **/dashboard** tracks mood, social battery, goals and post-event reflections so you can see how far you've come 📈."),
-    (("database", "dbms", "table", "sql", "postgres"), "Social Shield runs on **PostgreSQL** with 20+ related tables such as users, events, event_reviews, user_reports, fake_calls, templates, self_defense, game_progress and user_feedback. See `database/schema.sql` 🗄️."),
+    (("database", "dbms", "table", "sql", "postgres"), "Social Shield runs on **PostgreSQL** with 20+ related tables such as users, events, event_reviews, user_reports, fake_calls, templates, self_defense, game_progress and user_feedback. See `socialshield-database/schema.sql` 🗄️."),
     (("hello", "hi", "hey", "salam", "assalam"), "Hi there 🌸 I'm Shelly, your quiet companion. Ask me about events, fake calls, conversation starters, games, or anything on Social Shield."),
 ]
 

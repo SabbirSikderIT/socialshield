@@ -1,6 +1,6 @@
 """SQLAlchemy models for Social Shield.
 
-The same schema is available as raw PostgreSQL DDL in ../database/schema.sql.
+The same schema is available as raw PostgreSQL DDL in ../socialshield-database/schema.sql.
 """
 from datetime import datetime
 
